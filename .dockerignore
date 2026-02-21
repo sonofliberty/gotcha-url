@@ -6,4 +6,5 @@ docker/
 docker-compose.yml
 CLAUDE.md
 .env
+.env.local
 .dockerignore

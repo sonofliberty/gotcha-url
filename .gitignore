@@ -20,6 +20,7 @@ Thumbs.db
 
 # Docker
 db_data/
+k8s
 
 # Claude Code
 .claude/
