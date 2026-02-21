@@ -24,3 +24,8 @@ k8s
 
 # Claude Code
 .claude/
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
