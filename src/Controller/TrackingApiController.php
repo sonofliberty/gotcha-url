@@ -67,6 +67,8 @@ class TrackingApiController extends AbstractController
         $visit->setLanguage(mb_substr((string) ($data['language'] ?? ''), 0, 10) ?: null);
         $visit->setPlatform(mb_substr((string) ($data['platform'] ?? ''), 0, 64) ?: null);
         $visit->setCookiesEnabled(isset($data['cookiesEnabled']) ? (bool) $data['cookiesEnabled'] : null);
+        $visit->setCountryCode(mb_substr((string) $request->headers->get('CF-IPCountry', ''), 0, 2) ?: null);
+        $visit->setCity(mb_substr((string) $request->headers->get('CF-IPCity', ''), 0, 128) ?: null);
 
         $em->persist($visit);
         $em->flush();
