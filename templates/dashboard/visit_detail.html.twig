@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Visit Details - Gotcha URL{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Visit Details</h4>
+    <a href="{{ path('app_link_detail', {id: visit.link.id}) }}" class="btn btn-sm btn-outline-secondary">&larr; Back to Link</a>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header bg-transparent">Request</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Visited at</dt>
+                    <dd class="col-sm-8">{{ visit.createdAt|date('M j, Y H:i:s') }}</dd>
+
+                    <dt class="col-sm-4">IP Address</dt>
+                    <dd class="col-sm-8"><code>{{ visit.ipAddress }}</code></dd>
+
+                    <dt class="col-sm-4">User Agent</dt>
+                    <dd class="col-sm-8" style="word-break: break-all;">{{ visit.userAgent ?? '-' }}</dd>
+
+                    <dt class="col-sm-4">Referrer</dt>
+                    <dd class="col-sm-8 mb-0" style="word-break: break-all;">
+                        {% if visit.referrer %}
+                            {{ visit.referrer }}
+                        {% else %}
+                            <span class="text-muted">Direct / None</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3">
+        <div class="card h-100">
+            <div class="card-header bg-transparent">Location</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Country</dt>
+                    <dd class="col-sm-7">{{ visit.countryCode ?? '-' }}</dd>
+
+                    <dt class="col-sm-5">City</dt>
+                    <dd class="col-sm-7">{{ visit.city ?? '-' }}</dd>
+
+                    <dt class="col-sm-5">Timezone</dt>
+                    <dd class="col-sm-7 mb-0">{{ visit.timezone ?? '-' }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3">
+        <div class="card h-100">
+            <div class="card-header bg-transparent">Device</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Platform</dt>
+                    <dd class="col-sm-7">{{ visit.platform ?? '-' }}</dd>
+
+                    <dt class="col-sm-5">Screen</dt>
+                    <dd class="col-sm-7">{{ visit.screenResolution ?? '-' }}</dd>
+
+                    <dt class="col-sm-5">Language</dt>
+                    <dd class="col-sm-7">{{ visit.language ?? '-' }}</dd>
+
+                    <dt class="col-sm-5">Cookies</dt>
+                    <dd class="col-sm-7 mb-0">
+                        {% if visit.cookiesEnabled is null %}
+                            -
+                        {% elseif visit.cookiesEnabled %}
+                            <span class="text-success">Enabled</span>
+                        {% else %}
+                            <span class="text-danger">Disabled</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+security:
+    providers:
+        account_code_provider:
+            id: App\Security\AccountCodeUserProvider
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        redirect:
+            pattern: ^/[a-zA-Z0-9]{7}$
+            security: false
+
+        api_track:
+            pattern: ^/api/track$
+            security: false
+
+        main:
+            lazy: true
+            provider: account_code_provider
+            custom_authenticators:
+                - App\Security\AccountCodeAuthenticator
+            logout:
+                path: /logout
+                target: /login
+                clear_site_data: ['cookies']
+
+    access_control:
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/dashboard, roles: IS_AUTHENTICATED_FULLY }

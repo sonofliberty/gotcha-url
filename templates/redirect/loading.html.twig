@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #0f0f0f;
+            color: #2eb84a;
+            font-family: 'Courier New', Courier, 'Liberation Mono', 'Consolas', monospace;
+        }
+        .loader {
+            text-align: center;
+        }
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(34,204,85,0.1);
+            border-top-color: #22cc55;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loader p {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="loader">
+        <div class="spinner"></div>
+        <p>Redirecting...</p>
+    </div>
+
+    <script>
+        (function() {
+            var targetUrl = {{ targetUrl|json_encode|raw }};
+            var slug = {{ slug|json_encode|raw }};
+            var trackToken = {{ trackToken|json_encode|raw }};
+            var trackTs = {{ trackTs|json_encode|raw }};
+
+            var data = {
+                slug: slug,
+                token: trackToken,
+                ts: trackTs,
+                screenResolution: screen.width + 'x' + screen.height,
+                timezone: '',
+                language: navigator.language || '',
+                platform: navigator.platform || '',
+                cookiesEnabled: navigator.cookieEnabled,
+                referrer: document.referrer || ''
+            };
+
+            try {
+                data.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            } catch(e) {}
+
+            fetch('/api/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(json) {
+                window.location.href = json.redirect || targetUrl;
+            })
+            .catch(function() {
+                window.location.href = targetUrl;
+            });
+        })();
+    </script>
+</body>
+</html>

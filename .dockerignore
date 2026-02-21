@@ -1,0 +1,9 @@
+var/
+vendor/
+.git/
+docker/
+!docker/nginx/
+docker-compose.yml
+CLAUDE.md
+.env
+.dockerignore

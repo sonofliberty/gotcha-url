@@ -1,0 +1,512 @@
+/* ============================================
+   Matrix Theme — green-on-black hacker aesthetic
+   Loaded after bootstrap.min.css
+   ============================================ */
+
+:root {
+    --matrix-black: #0f0f0f;
+    --matrix-dark: #141414;
+    --matrix-dark-alt: #1a1a1a;
+    --matrix-green: #22cc55;
+    --matrix-green-dim: #2eb84a;
+    --matrix-green-muted: #217a30;
+    --matrix-green-faint: #123d18;
+
+    /* Bootstrap overrides */
+    --bs-body-bg: var(--matrix-black);
+    --bs-body-color: var(--matrix-green-dim);
+    --bs-body-font-family: 'Courier New', Courier, 'Liberation Mono', 'Consolas', monospace;
+    --bs-primary: var(--matrix-green);
+    --bs-primary-rgb: 34, 204, 85;
+    --bs-link-color: var(--matrix-green);
+    --bs-link-color-rgb: 34, 204, 85;
+    --bs-link-hover-color: #55dd77;
+    --bs-border-color: var(--matrix-green-muted);
+    --bs-secondary-bg: var(--matrix-dark);
+    --bs-tertiary-bg: var(--matrix-dark-alt);
+    --bs-emphasis-color: var(--matrix-green);
+}
+
+/* ---- Global ---- */
+
+body {
+    background: var(--matrix-black);
+    color: var(--matrix-green-dim);
+    font-family: 'Courier New', Courier, 'Liberation Mono', 'Consolas', monospace;
+}
+
+a {
+    color: var(--matrix-green);
+    text-shadow: 0 0 4px rgba(34, 204, 85, 0.2);
+}
+
+a:hover {
+    color: #55dd77;
+    text-shadow: 0 0 8px rgba(34, 204, 85, 0.3);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--matrix-green);
+    text-shadow: 0 0 6px rgba(34, 204, 85, 0.2);
+}
+
+code {
+    color: var(--matrix-green);
+    text-shadow: 0 0 3px rgba(34, 204, 85, 0.3);
+}
+
+hr {
+    border-color: var(--matrix-green-muted);
+    opacity: 0.5;
+}
+
+::selection {
+    background: var(--matrix-green);
+    color: var(--matrix-black);
+}
+
+/* ---- Navbar ---- */
+
+.navbar {
+    background: var(--matrix-dark) !important;
+    border-bottom: 1px solid var(--matrix-green-muted);
+    box-shadow: 0 2px 10px rgba(34, 204, 85, 0.08);
+}
+
+.navbar-brand {
+    color: var(--matrix-green) !important;
+    text-shadow: 0 0 8px rgba(34, 204, 85, 0.3);
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.navbar-brand:hover {
+    color: #55dd77 !important;
+}
+
+/* ---- Cards ---- */
+
+.card {
+    background: var(--matrix-dark);
+    border: 1px solid var(--matrix-green-muted);
+    box-shadow: 0 0 12px rgba(34, 204, 85, 0.06);
+    color: var(--matrix-green-dim);
+}
+
+.card-header {
+    background: var(--matrix-dark-alt) !important;
+    border-bottom: 1px solid var(--matrix-green-muted);
+    color: var(--matrix-green);
+}
+
+.card-title {
+    color: var(--matrix-green);
+}
+
+.card-body {
+    color: var(--matrix-green-dim);
+}
+
+/* ---- Tables ---- */
+
+.table {
+    --bs-table-bg: var(--matrix-dark);
+    --bs-table-color: var(--matrix-green-dim);
+    --bs-table-border-color: var(--matrix-green-muted);
+    --bs-table-striped-bg: var(--matrix-dark-alt);
+    --bs-table-striped-color: var(--matrix-green-dim);
+    --bs-table-hover-bg: var(--matrix-green-faint);
+    --bs-table-hover-color: var(--matrix-green);
+    color: var(--matrix-green-dim);
+    border-color: var(--matrix-green-muted);
+}
+
+.table > thead {
+    color: var(--matrix-green);
+}
+
+.table > thead th {
+    background: var(--matrix-dark-alt);
+    color: var(--matrix-green);
+    border-bottom-color: var(--matrix-green-muted);
+}
+
+.table-light,
+.table-light th,
+.table-light td {
+    --bs-table-bg: var(--matrix-dark-alt) !important;
+    --bs-table-color: var(--matrix-green) !important;
+    background: var(--matrix-dark-alt) !important;
+    color: var(--matrix-green) !important;
+}
+
+.table > tbody > tr {
+    border-bottom-color: var(--matrix-green-muted);
+}
+
+.table > tbody > tr:hover {
+    background: var(--matrix-green-faint);
+}
+
+/* ---- Forms ---- */
+
+.form-control {
+    background: var(--matrix-dark);
+    border-color: var(--matrix-green-muted);
+    color: var(--matrix-green-dim);
+}
+
+.form-control:focus {
+    background: var(--matrix-dark);
+    border-color: var(--matrix-green);
+    color: var(--matrix-green);
+    box-shadow: 0 0 0 0.25rem rgba(34, 204, 85, 0.12);
+}
+
+.form-control::placeholder {
+    color: var(--matrix-green-muted);
+}
+
+.form-label {
+    color: var(--matrix-green-dim);
+}
+
+.input-group-text {
+    background: var(--matrix-dark-alt) !important;
+    border-color: var(--matrix-green-muted);
+    color: var(--matrix-green-dim);
+}
+
+.input-group-text.bg-white {
+    background: var(--matrix-dark-alt) !important;
+    color: var(--matrix-green-dim);
+}
+
+.form-select {
+    background-color: var(--matrix-dark);
+    border-color: var(--matrix-green-muted);
+    color: var(--matrix-green-dim);
+}
+
+.form-select:focus {
+    border-color: var(--matrix-green);
+    box-shadow: 0 0 0 0.25rem rgba(34, 204, 85, 0.12);
+}
+
+/* ---- Buttons ---- */
+
+.btn-primary {
+    background-color: var(--matrix-green-faint);
+    border-color: var(--matrix-green);
+    color: var(--matrix-green);
+}
+
+.btn-primary:hover {
+    background-color: var(--matrix-green-muted);
+    border-color: var(--matrix-green);
+    color: var(--matrix-black);
+}
+
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--matrix-green-muted);
+    border-color: var(--matrix-green);
+    color: var(--matrix-black);
+    box-shadow: 0 0 0 0.25rem rgba(34, 204, 85, 0.2);
+}
+
+.btn-outline-secondary {
+    border-color: var(--matrix-green-muted);
+    color: var(--matrix-green-dim);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--matrix-green-faint);
+    border-color: var(--matrix-green);
+    color: var(--matrix-green);
+}
+
+.btn-outline-light {
+    border-color: var(--matrix-green-dim);
+    color: var(--matrix-green-dim);
+}
+
+.btn-outline-light:hover {
+    background-color: var(--matrix-green-faint);
+    border-color: var(--matrix-green);
+    color: var(--matrix-green);
+}
+
+.btn-outline-success {
+    border-color: var(--matrix-green);
+    color: var(--matrix-green);
+}
+
+.btn-outline-success:hover {
+    background-color: var(--matrix-green);
+    border-color: var(--matrix-green);
+    color: var(--matrix-black);
+}
+
+.btn-success {
+    background-color: var(--matrix-green);
+    border-color: var(--matrix-green);
+    color: var(--matrix-black);
+}
+
+.btn-success:hover {
+    background-color: #44cc66;
+    border-color: #44cc66;
+    color: var(--matrix-black);
+}
+
+.btn-danger,
+.btn-outline-danger {
+    border-color: #ff3333;
+    color: #ff3333;
+    background: transparent;
+}
+
+.btn-danger:hover,
+.btn-outline-danger:hover {
+    background-color: rgba(255, 51, 51, 0.15);
+    border-color: #ff5555;
+    color: #ff5555;
+}
+
+.btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* ---- Badges ---- */
+
+.badge.bg-info {
+    background-color: var(--matrix-green-faint) !important;
+    color: var(--matrix-green) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--matrix-green-faint) !important;
+    color: var(--matrix-green) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--matrix-dark-alt) !important;
+    color: var(--matrix-green-dim) !important;
+    border: 1px solid var(--matrix-green-muted);
+}
+
+.badge.bg-primary {
+    background-color: var(--matrix-green-faint) !important;
+    color: var(--matrix-green) !important;
+}
+
+/* ---- Alerts ---- */
+
+.alert-success {
+    background-color: rgba(34, 204, 85, 0.1);
+    border-color: var(--matrix-green-muted);
+    color: var(--matrix-green);
+}
+
+.alert-danger {
+    background-color: rgba(255, 51, 51, 0.1);
+    border-color: #662222;
+    color: #ff5555;
+}
+
+.alert-warning {
+    background-color: rgba(255, 200, 0, 0.1);
+    border-color: #665500;
+    color: #ffcc33;
+}
+
+.alert-info {
+    background-color: rgba(34, 204, 85, 0.06);
+    border-color: var(--matrix-green-muted);
+    color: var(--matrix-green-dim);
+}
+
+/* ---- Pagination ---- */
+
+.page-link {
+    background-color: var(--matrix-dark);
+    border-color: var(--matrix-green-muted);
+    color: var(--matrix-green-dim);
+}
+
+.page-link:hover {
+    background-color: var(--matrix-green-faint);
+    border-color: var(--matrix-green);
+    color: var(--matrix-green);
+}
+
+.page-item.active .page-link {
+    background-color: var(--matrix-green-faint);
+    border-color: var(--matrix-green);
+    color: var(--matrix-green);
+}
+
+.page-item.disabled .page-link {
+    background-color: var(--matrix-dark);
+    border-color: var(--matrix-green-muted);
+    color: var(--matrix-green-muted);
+}
+
+/* ---- Text utilities ---- */
+
+.text-muted {
+    color: var(--matrix-green-muted) !important;
+}
+
+.text-warning {
+    color: #ffcc33 !important;
+}
+
+.text-danger {
+    color: #ff5555 !important;
+}
+
+.text-success {
+    color: var(--matrix-green) !important;
+}
+
+.text-info {
+    color: var(--matrix-green-dim) !important;
+}
+
+.text-light {
+    color: var(--matrix-green-dim) !important;
+}
+
+.text-primary {
+    color: var(--matrix-green) !important;
+}
+
+.text-secondary {
+    color: var(--matrix-green-muted) !important;
+}
+
+/* ---- Background utilities ---- */
+
+.bg-light {
+    background-color: var(--matrix-dark-alt) !important;
+}
+
+.bg-white {
+    background-color: var(--matrix-dark) !important;
+}
+
+.bg-primary {
+    background-color: var(--matrix-dark) !important;
+}
+
+/* ---- Dropdown ---- */
+
+.dropdown-menu {
+    background-color: var(--matrix-dark);
+    border: 1px solid var(--matrix-green-muted);
+}
+
+.dropdown-item {
+    color: var(--matrix-green-dim);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: var(--matrix-green-faint);
+    color: var(--matrix-green);
+}
+
+/* ---- Modal ---- */
+
+.modal-content {
+    background-color: var(--matrix-dark);
+    border: 1px solid var(--matrix-green-muted);
+    color: var(--matrix-green-dim);
+}
+
+.modal-header {
+    border-bottom-color: var(--matrix-green-muted);
+}
+
+.modal-footer {
+    border-top-color: var(--matrix-green-muted);
+}
+
+/* ---- List Group ---- */
+
+.list-group-item {
+    background-color: var(--matrix-dark);
+    border-color: var(--matrix-green-muted);
+    color: var(--matrix-green-dim);
+}
+
+.list-group-item:hover {
+    background-color: var(--matrix-green-faint);
+}
+
+/* ---- Definition lists ---- */
+
+dt {
+    color: var(--matrix-green-muted);
+}
+
+dd {
+    color: var(--matrix-green-dim);
+}
+
+/* ---- Scrollbar ---- */
+
+/* Webkit */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--matrix-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--matrix-green-muted);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--matrix-green-dim);
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--matrix-green-muted) var(--matrix-dark);
+}
+
+/* ---- Focus / glow effects ---- */
+
+*:focus-visible {
+    outline: 2px solid var(--matrix-green);
+    outline-offset: 2px;
+    box-shadow: 0 0 8px rgba(34, 204, 85, 0.2);
+}
+
+/* ---- Small / detail text ---- */
+
+small, .small {
+    color: var(--matrix-green-muted);
+}
+
+/* ---- Breadcrumb ---- */
+
+.breadcrumb-item a {
+    color: var(--matrix-green);
+}
+
+.breadcrumb-item.active {
+    color: var(--matrix-green-muted);
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: var(--matrix-green-muted);
+}
