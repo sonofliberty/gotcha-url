@@ -51,7 +51,7 @@ RUN bin/console cache:clear --env=prod --no-interaction \
 RUN chown -R www-data:www-data var/
 
 # Entrypoint: start PHP-FPM in background, Nginx in foreground
-RUN printf '#!/bin/sh\nphp-fpm -D\nnginx -g "daemon off;"\n' > /entrypoint.sh \
+RUN printf '#!/bin/sh\nbin/console doctrine:migrations:migrate --no-interaction --allow-no-migration\nphp-fpm -D\nnginx -g "daemon off;"\n' > /entrypoint.sh \
     && chmod +x /entrypoint.sh
 
 EXPOSE 80

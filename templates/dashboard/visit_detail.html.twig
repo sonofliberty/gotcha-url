@@ -8,7 +8,7 @@
     <a href="{{ path('app_link_detail', {id: visit.link.id}) }}" class="btn btn-sm btn-outline-secondary">&larr; Back to Link</a>
 </div>
 
-<div class="row g-3">
+<div class="row g-3 mb-3">
     <div class="col-lg-6">
         <div class="card h-100">
             <div class="card-header bg-transparent">Request</div>
@@ -36,46 +36,141 @@
         </div>
     </div>
 
-    <div class="col-lg-3">
+    <div class="col-lg-6">
         <div class="card h-100">
             <div class="card-header bg-transparent">Location</div>
             <div class="card-body">
                 <dl class="row mb-0">
-                    <dt class="col-sm-5">Country</dt>
-                    <dd class="col-sm-7">{{ visit.countryCode ?? '-' }}</dd>
+                    <dt class="col-sm-4">Country</dt>
+                    <dd class="col-sm-8">{{ visit.countryCode ?? '-' }}</dd>
 
-                    <dt class="col-sm-5">City</dt>
-                    <dd class="col-sm-7">{{ visit.city ?? '-' }}</dd>
+                    <dt class="col-sm-4">City</dt>
+                    <dd class="col-sm-8">{{ visit.city ?? '-' }}</dd>
 
-                    <dt class="col-sm-5">Timezone</dt>
-                    <dd class="col-sm-7 mb-0">{{ visit.timezone ?? '-' }}</dd>
+                    <dt class="col-sm-4">Timezone</dt>
+                    <dd class="col-sm-8 mb-0">{{ visit.timezone ?? '-' }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-header bg-transparent">Screen</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-6">Resolution</dt>
+                    <dd class="col-sm-6">{{ visit.screenResolution ?? '-' }}</dd>
+
+                    <dt class="col-sm-6">Viewport</dt>
+                    <dd class="col-sm-6">
+                        {% if visit.viewportWidth and visit.viewportHeight %}
+                            {{ visit.viewportWidth }}x{{ visit.viewportHeight }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-6">Pixel Ratio</dt>
+                    <dd class="col-sm-6">{{ visit.devicePixelRatio ?? '-' }}</dd>
+
+                    <dt class="col-sm-6">Color Depth</dt>
+                    <dd class="col-sm-6 mb-0">
+                        {% if visit.colorDepth is not null %}
+                            {{ visit.colorDepth }}-bit
+                        {% else %}
+                            -
+                        {% endif %}
+                    </dd>
                 </dl>
             </div>
         </div>
     </div>
 
-    <div class="col-lg-3">
+    <div class="col-lg-4">
         <div class="card h-100">
             <div class="card-header bg-transparent">Device</div>
             <div class="card-body">
                 <dl class="row mb-0">
-                    <dt class="col-sm-5">Platform</dt>
-                    <dd class="col-sm-7">{{ visit.platform ?? '-' }}</dd>
+                    <dt class="col-sm-6">Platform</dt>
+                    <dd class="col-sm-6">{{ visit.platform ?? '-' }}</dd>
 
-                    <dt class="col-sm-5">Screen</dt>
-                    <dd class="col-sm-7">{{ visit.screenResolution ?? '-' }}</dd>
+                    <dt class="col-sm-6">Touch</dt>
+                    <dd class="col-sm-6">
+                        {% if visit.touchSupport is null %}
+                            -
+                        {% elseif visit.touchSupport %}
+                            <span class="text-success">Yes</span> ({{ visit.maxTouchPoints ?? 0 }} pts)
+                        {% else %}
+                            <span class="text-muted">No</span>
+                        {% endif %}
+                    </dd>
 
-                    <dt class="col-sm-5">Language</dt>
-                    <dd class="col-sm-7">{{ visit.language ?? '-' }}</dd>
+                    <dt class="col-sm-6">CPU Cores</dt>
+                    <dd class="col-sm-6">{{ visit.hardwareConcurrency ?? '-' }}</dd>
 
-                    <dt class="col-sm-5">Cookies</dt>
-                    <dd class="col-sm-7 mb-0">
+                    <dt class="col-sm-6">Memory</dt>
+                    <dd class="col-sm-6">
+                        {% if visit.deviceMemory %}
+                            {{ visit.deviceMemory }} GB
+                        {% else %}
+                            -
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-6">GPU</dt>
+                    <dd class="col-sm-6 mb-0" style="word-break: break-all;">{{ visit.webglRenderer ?? '-' }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-header bg-transparent">Browser</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-6">Vendor</dt>
+                    <dd class="col-sm-6">{{ visit.vendor ?? '-' }}</dd>
+
+                    <dt class="col-sm-6">Language</dt>
+                    <dd class="col-sm-6">{{ visit.language ?? '-' }}</dd>
+
+                    <dt class="col-sm-6">Connection</dt>
+                    <dd class="col-sm-6">{{ visit.connectionType ?? '-' }}</dd>
+
+                    <dt class="col-sm-6">Cookies</dt>
+                    <dd class="col-sm-6">
                         {% if visit.cookiesEnabled is null %}
                             -
                         {% elseif visit.cookiesEnabled %}
                             <span class="text-success">Enabled</span>
                         {% else %}
                             <span class="text-danger">Disabled</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-6">DNT</dt>
+                    <dd class="col-sm-6">
+                        {% if visit.doNotTrack is null %}
+                            -
+                        {% elseif visit.doNotTrack %}
+                            <span class="text-warning">Enabled</span>
+                        {% else %}
+                            <span class="text-muted">Disabled</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-6">PDF Viewer</dt>
+                    <dd class="col-sm-6 mb-0">
+                        {% if visit.pdfViewerEnabled is null %}
+                            -
+                        {% elseif visit.pdfViewerEnabled %}
+                            <span class="text-success">Yes</span>
+                        {% else %}
+                            <span class="text-muted">No</span>
                         {% endif %}
                     </dd>
                 </dl>

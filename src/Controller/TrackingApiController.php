@@ -69,6 +69,19 @@ class TrackingApiController extends AbstractController
         $visit->setCookiesEnabled(isset($data['cookiesEnabled']) ? (bool) $data['cookiesEnabled'] : null);
         $visit->setCountryCode(mb_substr((string) $request->headers->get('CF-IPCountry', ''), 0, 2) ?: null);
         $visit->setCity(mb_substr((string) $request->headers->get('CF-IPCity', ''), 0, 128) ?: null);
+        $visit->setDevicePixelRatio(mb_substr((string) ($data['devicePixelRatio'] ?? ''), 0, 10) ?: null);
+        $visit->setColorDepth(isset($data['colorDepth']) ? (int) $data['colorDepth'] : null);
+        $visit->setTouchSupport(isset($data['touchSupport']) ? (bool) $data['touchSupport'] : null);
+        $visit->setMaxTouchPoints(isset($data['maxTouchPoints']) ? (int) $data['maxTouchPoints'] : null);
+        $visit->setHardwareConcurrency(isset($data['hardwareConcurrency']) ? (int) $data['hardwareConcurrency'] : null);
+        $visit->setDeviceMemory(mb_substr((string) ($data['deviceMemory'] ?? ''), 0, 10) ?: null);
+        $visit->setConnectionType(mb_substr((string) ($data['connectionType'] ?? ''), 0, 20) ?: null);
+        $visit->setDoNotTrack(isset($data['doNotTrack']) ? (bool) $data['doNotTrack'] : null);
+        $visit->setViewportWidth(isset($data['viewportWidth']) ? (int) $data['viewportWidth'] : null);
+        $visit->setViewportHeight(isset($data['viewportHeight']) ? (int) $data['viewportHeight'] : null);
+        $visit->setVendor(mb_substr((string) ($data['vendor'] ?? ''), 0, 64) ?: null);
+        $visit->setPdfViewerEnabled(isset($data['pdfViewerEnabled']) ? (bool) $data['pdfViewerEnabled'] : null);
+        $visit->setWebglRenderer(mb_substr((string) ($data['webglRenderer'] ?? ''), 0, 256) ?: null);
 
         $em->persist($visit);
         $em->flush();

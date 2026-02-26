@@ -58,11 +58,35 @@
                 language: navigator.language || '',
                 platform: navigator.platform || '',
                 cookiesEnabled: navigator.cookieEnabled,
-                referrer: document.referrer || ''
+                referrer: document.referrer || '',
+                devicePixelRatio: String(window.devicePixelRatio || ''),
+                colorDepth: screen.colorDepth || null,
+                touchSupport: navigator.maxTouchPoints > 0,
+                maxTouchPoints: navigator.maxTouchPoints || 0,
+                hardwareConcurrency: navigator.hardwareConcurrency || null,
+                deviceMemory: navigator.deviceMemory ? String(navigator.deviceMemory) : null,
+                connectionType: (navigator.connection && navigator.connection.effectiveType) ? navigator.connection.effectiveType : null,
+                doNotTrack: navigator.doNotTrack === '1',
+                viewportWidth: window.innerWidth,
+                viewportHeight: window.innerHeight,
+                vendor: navigator.vendor || null,
+                pdfViewerEnabled: typeof navigator.pdfViewerEnabled !== 'undefined' ? navigator.pdfViewerEnabled : null,
+                webglRenderer: null
             };
 
             try {
                 data.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            } catch(e) {}
+
+            try {
+                var canvas = document.createElement('canvas');
+                var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (gl) {
+                    var ext = gl.getExtension('WEBGL_debug_renderer_info');
+                    if (ext) {
+                        data.webglRenderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) || null;
+                    }
+                }
             } catch(e) {}
 
             fetch('/api/track', {
