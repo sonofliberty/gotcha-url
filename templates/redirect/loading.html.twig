@@ -4,14 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
-    <script>
-    (function() {
-        var s = localStorage.getItem('gotcha-theme');
-        var t = (s === 'light' || s === 'dark') ? s
-            : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-bs-theme', t);
-    })();
-    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -41,16 +33,6 @@
         .loader p {
             font-size: 14px;
             opacity: 0.7;
-        }
-        /* Dark mode overrides */
-        [data-bs-theme="dark"] body {
-            background: #0f0f0f;
-            color: #2eb84a;
-            font-family: 'Courier New', Courier, 'Liberation Mono', 'Consolas', monospace;
-        }
-        [data-bs-theme="dark"] .spinner {
-            border-color: rgba(34,204,85,0.1);
-            border-top-color: #22cc55;
         }
     </style>
 </head>
