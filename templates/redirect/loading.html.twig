@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
+    <script>
+    (function() {
+        var s = localStorage.getItem('gotcha-theme');
+        var t = (s === 'light' || s === 'dark') ? s
+            : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-bs-theme', t);
+    })();
+    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -11,9 +19,9 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: #0f0f0f;
-            color: #2eb84a;
-            font-family: 'Courier New', Courier, 'Liberation Mono', 'Consolas', monospace;
+            background: #f8f9fa;
+            color: #6c757d;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         }
         .loader {
             text-align: center;
@@ -21,8 +29,8 @@
         .spinner {
             width: 48px;
             height: 48px;
-            border: 4px solid rgba(34,204,85,0.1);
-            border-top-color: #22cc55;
+            border: 4px solid rgba(0,0,0,0.1);
+            border-top-color: #0d6efd;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
             margin: 0 auto 20px;
@@ -33,6 +41,16 @@
         .loader p {
             font-size: 14px;
             opacity: 0.7;
+        }
+        /* Dark mode overrides */
+        [data-bs-theme="dark"] body {
+            background: #0f0f0f;
+            color: #2eb84a;
+            font-family: 'Courier New', Courier, 'Liberation Mono', 'Consolas', monospace;
+        }
+        [data-bs-theme="dark"] .spinner {
+            border-color: rgba(34,204,85,0.1);
+            border-top-color: #22cc55;
         }
     </style>
 </head>

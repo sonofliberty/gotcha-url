@@ -1,3 +1,51 @@
+// Theme switcher
+(function() {
+    function getPreferredTheme() {
+        return localStorage.getItem('gotcha-theme') || 'auto';
+    }
+
+    function getResolvedTheme(pref) {
+        if (pref === 'auto') {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return pref;
+    }
+
+    function applyTheme(pref) {
+        var resolved = getResolvedTheme(pref);
+        document.documentElement.setAttribute('data-bs-theme', resolved);
+
+        // Update button icon visibility
+        document.querySelectorAll('.theme-icon-light, .theme-icon-dark, .theme-icon-auto').forEach(function(el) {
+            el.classList.add('d-none');
+        });
+        var activeIcon = document.querySelector('.theme-icon-' + pref);
+        if (activeIcon) activeIcon.classList.remove('d-none');
+
+        // Mark active dropdown item
+        document.querySelectorAll('[data-theme-value]').forEach(function(btn) {
+            btn.classList.toggle('active', btn.getAttribute('data-theme-value') === pref);
+        });
+    }
+
+    // Apply on load
+    applyTheme(getPreferredTheme());
+
+    // Click handler for theme buttons
+    document.addEventListener('click', function(e) {
+        var btn = e.target.closest('[data-theme-value]');
+        if (!btn) return;
+        var value = btn.getAttribute('data-theme-value');
+        localStorage.setItem('gotcha-theme', value);
+        applyTheme(value);
+    });
+
+    // Re-apply when OS preference changes (for auto mode)
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+        applyTheme(getPreferredTheme());
+    });
+})();
+
 // Copy-to-clipboard
 document.addEventListener('click', function(e) {
     var btn = e.target.closest('.btn-copy');

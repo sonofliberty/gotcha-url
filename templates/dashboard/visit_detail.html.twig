@@ -3,9 +3,9 @@
 {% block title %}Visit Details - Gotcha URL{% endblock %}
 
 {% block body %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex align-items-center mb-4">
+    <a href="{{ path('app_link_detail', {id: visit.link.id}) }}" class="btn btn-sm btn-outline-secondary me-3">&larr; Back</a>
     <h4 class="mb-0">Visit Details</h4>
-    <a href="{{ path('app_link_detail', {id: visit.link.id}) }}" class="btn btn-sm btn-outline-secondary">&larr; Back to Link</a>
 </div>
 
 <div class="row g-3 mb-3">
