@@ -44,28 +44,39 @@ class DashboardController extends AbstractController
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
+        $linkType = trim((string) $request->request->get('link_type', 'redirect'));
         $targetUrl = trim((string) $request->request->get('target_url', ''));
-
+        $markdownContent = trim((string) $request->request->get('markdown_content', ''));
         $label = trim((string) $request->request->get('label', ''));
 
         $link = new Link();
         $link->setUser($user);
-        $link->setTargetUrl($targetUrl);
+        $link->setType($linkType === 'page' ? 'page' : 'redirect');
         $link->setSlug($slugGenerator->generate());
+
+        if ($link->isPage()) {
+            $link->setMarkdownContent($markdownContent);
+        } else {
+            $link->setTargetUrl($targetUrl);
+        }
+
         if ($label !== '') {
             $link->setLabel($label);
         }
 
         $errors = $validator->validate($link);
         if (count($errors) > 0) {
-            $this->addFlash('error', 'Invalid URL. Please enter a valid URL including http:// or https://');
+            $errorMsg = $link->isPage()
+                ? 'Content is required for page links.'
+                : 'Invalid URL. Please enter a valid URL including http:// or https://';
+            $this->addFlash('error', $errorMsg);
             return $this->redirectToRoute('app_dashboard');
         }
 
         $em->persist($link);
         $em->flush();
 
-        $this->addFlash('success', 'Link created successfully!');
+        $this->addFlash('success', $link->isPage() ? 'Content page created!' : 'Link created successfully!');
         return $this->redirectToRoute('app_dashboard');
     }
 
@@ -164,5 +175,39 @@ class DashboardController extends AbstractController
         $em->flush();
 
         return new JsonResponse(['label' => $link->getLabel()]);
+    }
+
+    #[Route('/dashboard/links/{id}/content', name: 'app_update_content', methods: ['PATCH'])]
+    public function editContent(
+        string $id,
+        Request $request,
+        LinkRepository $linkRepository,
+        EntityManagerInterface $em,
+        ValidatorInterface $validator,
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+        $link = $linkRepository->find($id);
+
+        if (!$link || !$link->getUser()->getId()->equals($user->getId())) {
+            return new JsonResponse(['error' => 'Link not found.'], 404);
+        }
+
+        if (!$link->isPage()) {
+            return new JsonResponse(['error' => 'Only page links have editable content.'], 422);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $content = trim((string) ($data['markdown_content'] ?? ''));
+        $link->setMarkdownContent($content);
+
+        $errors = $validator->validate($link);
+        if (count($errors) > 0) {
+            return new JsonResponse(['error' => (string) $errors->get(0)->getMessage()], 422);
+        }
+
+        $em->flush();
+
+        return new JsonResponse(['markdown_content' => $link->getMarkdownContent()]);
     }
 }

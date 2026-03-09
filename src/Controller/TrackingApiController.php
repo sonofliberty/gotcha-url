@@ -86,6 +86,10 @@ class TrackingApiController extends AbstractController
         $em->persist($visit);
         $em->flush();
 
+        if ($link->isPage()) {
+            return new JsonResponse(['tracked' => true]);
+        }
+
         return new JsonResponse(['redirect' => $link->getTargetUrl()]);
     }
 }

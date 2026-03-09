@@ -489,6 +489,38 @@
     scrollbar-color: var(--matrix-green-muted) var(--matrix-dark);
 }
 
+/* ---- Markdown content ---- */
+
+[data-bs-theme="dark"] .markdown-content pre {
+    background: var(--matrix-dark-alt);
+    border-color: var(--matrix-green-muted);
+    color: var(--matrix-green-dim);
+}
+
+[data-bs-theme="dark"] .markdown-content :not(pre) > code {
+    background: var(--matrix-dark-alt);
+    color: var(--matrix-green);
+}
+
+[data-bs-theme="dark"] .markdown-content blockquote {
+    border-left-color: var(--matrix-green-muted);
+    color: var(--matrix-green-dim);
+}
+
+[data-bs-theme="dark"] .markdown-content th,
+[data-bs-theme="dark"] .markdown-content td {
+    border-color: var(--matrix-green-muted);
+}
+
+[data-bs-theme="dark"] .markdown-content th {
+    background: var(--matrix-dark-alt);
+    color: var(--matrix-green);
+}
+
+[data-bs-theme="dark"] .markdown-content table {
+    color: var(--matrix-green-dim);
+}
+
 /* ---- Focus / glow effects ---- */
 
 [data-bs-theme="dark"] *:focus-visible {

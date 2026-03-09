@@ -135,6 +135,81 @@ document.addEventListener('click', function(e) {
     });
 }, true);
 
+// Link type toggle (create form)
+(function() {
+    var radios = document.querySelectorAll('input[name="link_type_radio"]');
+    if (!radios.length) return;
+
+    var hiddenInput = document.getElementById('link-type-input');
+    var redirectFields = document.getElementById('redirect-fields');
+    var pageFields = document.getElementById('page-fields');
+    var urlInput = document.getElementById('target-url-input');
+    var contentInput = document.getElementById('markdown-content-input');
+
+    radios.forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            var isPage = this.value === 'page';
+            hiddenInput.value = this.value;
+            redirectFields.classList.toggle('d-none', isPage);
+            pageFields.classList.toggle('d-none', !isPage);
+            urlInput.required = !isPage;
+            contentInput.required = isPage;
+        });
+    });
+})();
+
+// Content editor (link detail page)
+(function() {
+    var editBtn = document.getElementById('edit-content-btn');
+    if (!editBtn) return;
+
+    var display = document.getElementById('content-display');
+    var editor = document.getElementById('content-editor');
+    var textarea = document.getElementById('content-textarea');
+    var saveBtn = document.getElementById('save-content-btn');
+    var cancelBtn = document.getElementById('cancel-content-btn');
+    var linkId = editBtn.getAttribute('data-link-id');
+
+    editBtn.addEventListener('click', function() {
+        display.classList.add('d-none');
+        editBtn.classList.add('d-none');
+        editor.classList.remove('d-none');
+        textarea.focus();
+    });
+
+    cancelBtn.addEventListener('click', function() {
+        editor.classList.add('d-none');
+        display.classList.remove('d-none');
+        editBtn.classList.remove('d-none');
+        textarea.value = display.textContent.trim();
+    });
+
+    saveBtn.addEventListener('click', function() {
+        saveBtn.disabled = true;
+        fetch('/dashboard/links/' + linkId + '/content', {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({markdown_content: textarea.value})
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            saveBtn.disabled = false;
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            display.textContent = data.markdown_content;
+            editor.classList.add('d-none');
+            display.classList.remove('d-none');
+            editBtn.classList.remove('d-none');
+        })
+        .catch(function() {
+            saveBtn.disabled = false;
+            alert('Failed to save content.');
+        });
+    });
+})();
+
 // Relative time formatting
 (function() {
     var now = Date.now();

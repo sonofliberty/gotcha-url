@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\LinkRepository;
+use App\Service\MarkdownRenderer;
 use App\Service\TrackingTokenService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class RedirectController extends AbstractController
 {
     #[Route('/{slug}', name: 'app_track', requirements: ['slug' => '[a-zA-Z0-9]{7}'], priority: -100)]
-    public function track(string $slug, Request $request, LinkRepository $linkRepository, TrackingTokenService $tokenService): Response
+    public function track(string $slug, Request $request, LinkRepository $linkRepository, TrackingTokenService $tokenService, MarkdownRenderer $markdownRenderer): Response
     {
         $link = $linkRepository->findBySlug($slug);
 
@@ -21,6 +22,17 @@ class RedirectController extends AbstractController
         }
 
         $tokenData = $tokenService->generate($slug, $request->getClientIp() ?? '0.0.0.0');
+
+        if ($link->isPage()) {
+            $markdown = $link->getMarkdownContent() ?? '';
+            return $this->render('page/content.html.twig', [
+                'slug' => $slug,
+                'title' => $markdownRenderer->extractTitle($markdown),
+                'contentHtml' => $markdownRenderer->render($markdown),
+                'trackToken' => $tokenData['token'],
+                'trackTs' => $tokenData['ts'],
+            ]);
+        }
 
         return $this->render('redirect/loading.html.twig', [
             'slug' => $slug,

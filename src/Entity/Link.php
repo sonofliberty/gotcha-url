@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: LinkRepository::class)]
 class Link
@@ -21,10 +22,15 @@ class Link
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
-    #[Assert\NotBlank]
-    #[Assert\Url]
-    #[ORM\Column(length: 2048)]
-    private string $targetUrl;
+    #[ORM\Column(length: 10, options: ['default' => 'redirect'])]
+    private string $type = 'redirect';
+
+    #[ORM\Column(length: 2048, nullable: true)]
+    private ?string $targetUrl = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Assert\Length(max: 50000)]
+    private ?string $markdownContent = null;
 
     #[Assert\Regex(pattern: '/^[a-zA-Z0-9]{3,10}$/')]
     #[ORM\Column(length: 10, unique: true)]
@@ -65,15 +71,69 @@ class Link
         return $this;
     }
 
-    public function getTargetUrl(): string
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    public function isPage(): bool
+    {
+        return $this->type === 'page';
+    }
+
+    public function isRedirect(): bool
+    {
+        return $this->type === 'redirect';
+    }
+
+    public function getTargetUrl(): ?string
     {
         return $this->targetUrl;
     }
 
-    public function setTargetUrl(string $targetUrl): static
+    public function setTargetUrl(?string $targetUrl): static
     {
         $this->targetUrl = $targetUrl;
         return $this;
+    }
+
+    public function getMarkdownContent(): ?string
+    {
+        return $this->markdownContent;
+    }
+
+    public function setMarkdownContent(?string $markdownContent): static
+    {
+        $this->markdownContent = $markdownContent;
+        return $this;
+    }
+
+    #[Assert\Callback]
+    public function validate(ExecutionContextInterface $context): void
+    {
+        if ($this->type === 'redirect') {
+            if (empty($this->targetUrl)) {
+                $context->buildViolation('A target URL is required for redirect links.')
+                    ->atPath('targetUrl')
+                    ->addViolation();
+            } elseif (!filter_var($this->targetUrl, FILTER_VALIDATE_URL)) {
+                $context->buildViolation('Please enter a valid URL.')
+                    ->atPath('targetUrl')
+                    ->addViolation();
+            }
+        } elseif ($this->type === 'page') {
+            if (empty($this->markdownContent)) {
+                $context->buildViolation('Content is required for page links.')
+                    ->atPath('markdownContent')
+                    ->addViolation();
+            }
+        }
     }
 
     public function getSlug(): string

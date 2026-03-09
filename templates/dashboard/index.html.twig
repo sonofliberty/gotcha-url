@@ -5,17 +5,31 @@
 {% block body %}
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body py-3">
-        <form method="post" action="{{ path('app_create_link') }}">
-            <div class="input-group mb-2">
-                <span class="input-group-text bg-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-muted" viewBox="0 0 16 16">
-                        <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
-                        <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
-                    </svg>
-                </span>
-                <input type="url" class="form-control" name="target_url"
-                       placeholder="Paste a URL to shorten..." required>
-                <button type="submit" class="btn btn-primary">Shorten</button>
+        <form method="post" action="{{ path('app_create_link') }}" id="create-link-form">
+            <input type="hidden" name="link_type" id="link-type-input" value="redirect">
+            <div class="btn-group btn-group-sm mb-2 w-100" role="group">
+                <input type="radio" class="btn-check" name="link_type_radio" id="type-redirect" value="redirect" checked>
+                <label class="btn btn-outline-primary" for="type-redirect">Redirect Link</label>
+                <input type="radio" class="btn-check" name="link_type_radio" id="type-page" value="page">
+                <label class="btn btn-outline-primary" for="type-page">Content Page</label>
+            </div>
+            <div id="redirect-fields">
+                <div class="input-group mb-2">
+                    <span class="input-group-text bg-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-muted" viewBox="0 0 16 16">
+                            <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                            <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                        </svg>
+                    </span>
+                    <input type="url" class="form-control" name="target_url" id="target-url-input"
+                           placeholder="Paste a URL to shorten..." required>
+                    <button type="submit" class="btn btn-primary">Shorten</button>
+                </div>
+            </div>
+            <div id="page-fields" class="d-none">
+                <textarea class="form-control mb-2" name="markdown_content" id="markdown-content-input"
+                          rows="5" placeholder="Write your page content in Markdown..."></textarea>
+                <button type="submit" class="btn btn-primary">Create Page</button>
             </div>
             <input type="text" class="form-control form-control-sm" name="label"
                    placeholder="Label (optional)" maxlength="100">
@@ -47,8 +61,13 @@
             <tbody>
                 {% for link in links %}
                     <tr style="cursor:pointer" onclick="window.location='{{ path('app_link_detail', {id: link.id}) }}'">
-                        <td class="text-truncate" style="max-width: 350px;" title="{{ link.targetUrl }}">
-                            {{ link.targetUrl }}
+                        <td class="text-truncate" style="max-width: 350px;">
+                            {% if link.page %}
+                                <span class="badge bg-secondary">Page</span>
+                                <span class="text-muted small">Markdown content</span>
+                            {% else %}
+                                <span title="{{ link.targetUrl }}">{{ link.targetUrl }}</span>
+                            {% endif %}
                         </td>
                         <td onclick="event.stopPropagation()">
                             <span class="label-display" data-link-id="{{ link.id }}" data-label="{{ link.label ?? '' }}">
