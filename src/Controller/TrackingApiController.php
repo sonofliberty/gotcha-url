@@ -57,6 +57,10 @@ class TrackingApiController extends AbstractController
             return new JsonResponse(['error' => 'Link not found'], Response::HTTP_NOT_FOUND);
         }
 
+        if (!$link->isTrackingEnabled()) {
+            return new JsonResponse(['error' => 'Tracking is disabled for this link'], Response::HTTP_FORBIDDEN);
+        }
+
         $visit = new Visit();
         $visit->setLink($link);
         $visit->setIpAddress($request->getClientIp() ?? '0.0.0.0');

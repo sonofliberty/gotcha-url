@@ -55,6 +55,7 @@
                     <th>Label</th>
                     <th>Short Link</th>
                     <th>Visits</th>
+                    <th>Tracking</th>
                     <th>Created</th>
                 </tr>
             </thead>
@@ -85,6 +86,15 @@
                                     onclick="event.stopPropagation()" title="Copy short URL">Copy</button>
                         </td>
                         <td><span class="badge bg-info">{{ link.visitCount }}</span></td>
+                        <td onclick="event.stopPropagation()" class="text-center">
+                            <div class="form-check form-switch d-inline-block mb-0">
+                                <input class="form-check-input tracking-toggle"
+                                       type="checkbox"
+                                       role="switch"
+                                       data-link-id="{{ link.id }}"
+                                       {{ link.trackingEnabled ? 'checked' : '' }}>
+                            </div>
+                        </td>
                         <td class="text-nowrap">
                             <time datetime="{{ link.createdAt|date('c') }}">{{ link.createdAt|date('M j, Y') }}</time>
                         </td>

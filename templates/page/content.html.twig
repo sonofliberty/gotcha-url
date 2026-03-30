@@ -79,6 +79,7 @@
         {{ contentHtml|raw }}
     </div>
 
+    {% if trackToken is not null %}
     <script>
         (function() {
             var slug = {{ slug|json_encode|raw }};
@@ -132,5 +133,6 @@
             }).catch(function() {});
         })();
     </script>
+    {% endif %}
 </body>
 </html>

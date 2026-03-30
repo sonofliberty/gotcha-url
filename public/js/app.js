@@ -135,6 +135,30 @@ document.addEventListener('click', function(e) {
     });
 }, true);
 
+// Tracking toggle
+document.addEventListener('change', function(e) {
+    var toggle = e.target.closest('.tracking-toggle');
+    if (!toggle) return;
+
+    var linkId = toggle.getAttribute('data-link-id');
+    var enabled = toggle.checked;
+
+    fetch('/dashboard/links/' + linkId + '/tracking', {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({tracking_enabled: enabled})
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.error) {
+            toggle.checked = !enabled;
+        }
+    })
+    .catch(function() {
+        toggle.checked = !enabled;
+    });
+}, true);
+
 // Link type toggle (create form)
 (function() {
     var radios = document.querySelectorAll('input[name="link_type_radio"]');

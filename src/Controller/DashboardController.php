@@ -177,6 +177,30 @@ class DashboardController extends AbstractController
         return new JsonResponse(['label' => $link->getLabel()]);
     }
 
+    #[Route('/dashboard/links/{id}/tracking', name: 'app_update_tracking', methods: ['PATCH'])]
+    public function updateTracking(
+        string $id,
+        Request $request,
+        LinkRepository $linkRepository,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+        $link = $linkRepository->find($id);
+
+        if (!$link || !$link->getUser()->getId()->equals($user->getId())) {
+            return new JsonResponse(['error' => 'Link not found.'], 404);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $trackingEnabled = (bool) ($data['tracking_enabled'] ?? true);
+        $link->setTrackingEnabled($trackingEnabled);
+
+        $em->flush();
+
+        return new JsonResponse(['tracking_enabled' => $link->isTrackingEnabled()]);
+    }
+
     #[Route('/dashboard/links/{id}/content', name: 'app_update_content', methods: ['PATCH'])]
     public function editContent(
         string $id,

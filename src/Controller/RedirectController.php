@@ -21,7 +21,13 @@ class RedirectController extends AbstractController
             throw $this->createNotFoundException('Link not found.');
         }
 
-        $tokenData = $tokenService->generate($slug, $request->getClientIp() ?? '0.0.0.0');
+        if (!$link->isTrackingEnabled() && $link->isRedirect()) {
+            return $this->redirect($link->getTargetUrl());
+        }
+
+        $tokenData = $link->isTrackingEnabled()
+            ? $tokenService->generate($slug, $request->getClientIp() ?? '0.0.0.0')
+            : ['token' => null, 'ts' => null];
 
         if ($link->isPage()) {
             $markdown = $link->getMarkdownContent() ?? '';

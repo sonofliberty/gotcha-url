@@ -40,6 +40,9 @@ class Link
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $label = null;
 
+    #[ORM\Column(options: ['default' => true])]
+    private bool $trackingEnabled = true;
+
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
@@ -155,6 +158,17 @@ class Link
     public function setLabel(?string $label): static
     {
         $this->label = $label;
+        return $this;
+    }
+
+    public function isTrackingEnabled(): bool
+    {
+        return $this->trackingEnabled;
+    }
+
+    public function setTrackingEnabled(bool $trackingEnabled): static
+    {
+        $this->trackingEnabled = $trackingEnabled;
         return $this;
     }
 
