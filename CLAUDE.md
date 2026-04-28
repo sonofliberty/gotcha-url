@@ -45,7 +45,11 @@ All entities use UUID v7 binary primary keys (`Symfony\Component\Uid\UuidV7`). V
 
 ### Security Firewalls
 
-Routes `/{slug}` (pattern `^/[a-zA-Z0-9]{7}$`) and `/api/track` are **public** (no auth). Dashboard routes require `IS_AUTHENTICATED_FULLY`. The redirect route has `priority: -100` so it doesn't shadow other routes.
+Routes `/{slug}` (pattern `^/[a-zA-Z0-9]{7}$`) and `/api/track` are **public** (no auth). `/api/v1/*` is a stateless firewall (`ApiTokenAuthenticator`) requiring `Authorization: Bearer <accountCode>`; `/api/doc` is public. Dashboard routes require `IS_AUTHENTICATED_FULLY`. The redirect route has `priority: -100` so it doesn't shadow other routes.
+
+### REST API
+
+`/api/v1/links` (POST/GET), `/api/v1/links/{id}` (GET/DELETE). Bearer token = `User.accountCode`. Rate-limited 60 req/min per token (`api` limiter). JSON shape produced by `App\Service\LinkSerializer`. OpenAPI/Swagger UI at `/api/doc` via `nelmio/api-doc-bundle` (schema described by `App\ApiResource\LinkResource`).
 
 ### Frontend
 

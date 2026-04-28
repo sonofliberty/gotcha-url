@@ -37,6 +37,54 @@
     </div>
 </div>
 
+<details class="card border-0 shadow-sm mb-4">
+    <summary class="card-body py-2 d-flex align-items-center justify-content-between" style="cursor:pointer; list-style:none;">
+        <span class="fw-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16">
+                <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+                <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zM9 1.5v2A1.5 1.5 0 0 0 10.5 5h2V14a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+            </svg>
+            API Access
+        </span>
+        <span class="text-muted small">click to expand</span>
+    </summary>
+    <div class="card-body pt-0">
+        <p class="small mb-2">
+            Use the REST API to create links programmatically. Authenticate with your account code as a Bearer token.
+            See the <a href="/api/doc" target="_blank">interactive API docs</a> for full reference.
+        </p>
+        <label class="form-label small mb-1">Your API token (account code)</label>
+        <div class="input-group input-group-sm mb-2">
+            <input type="password" class="form-control font-monospace" id="api-token-input"
+                   value="{{ app.user.accountCode }}" readonly>
+            <button type="button" class="btn btn-outline-secondary" id="api-token-show">Show</button>
+            <button type="button" class="btn btn-outline-secondary" id="api-token-copy">Copy</button>
+        </div>
+        <div class="bg-light p-2 rounded small font-monospace text-break">
+            curl -X POST {{ app.request.schemeAndHttpHost }}/api/v1/links \<br>
+            &nbsp;&nbsp;-H "Authorization: Bearer &lt;your-token&gt;" \<br>
+            &nbsp;&nbsp;-H "Content-Type: application/json" \<br>
+            &nbsp;&nbsp;-d '{"target_url":"https://example.com"}'
+        </div>
+    </div>
+</details>
+<script>
+document.getElementById('api-token-show')?.addEventListener('click', function() {
+    var input = document.getElementById('api-token-input');
+    if (input.type === 'password') { input.type = 'text'; this.textContent = 'Hide'; }
+    else { input.type = 'password'; this.textContent = 'Show'; }
+});
+document.getElementById('api-token-copy')?.addEventListener('click', function() {
+    var input = document.getElementById('api-token-input');
+    navigator.clipboard.writeText(input.value).then(() => {
+        var orig = this.textContent;
+        this.textContent = 'Copied!';
+        this.classList.replace('btn-outline-secondary', 'btn-success');
+        setTimeout(() => { this.textContent = orig; this.classList.replace('btn-success', 'btn-outline-secondary'); }, 1500);
+    });
+});
+</script>
+
 {% if links|length == 0 %}
     <div class="text-center py-5 text-muted">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="mb-3 opacity-25" viewBox="0 0 16 16">

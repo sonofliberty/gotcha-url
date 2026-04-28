@@ -43,4 +43,19 @@ class LinkRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['slug' => $slug]) !== null;
     }
+
+    public function findOneByIdAndUser(string $id, User $user): ?Link
+    {
+        try {
+            return $this->createQueryBuilder('l')
+                ->andWhere('l.id = :id')
+                ->andWhere('l.user = :user')
+                ->setParameter('id', $id, 'uuid')
+                ->setParameter('user', $user->getId(), 'uuid')
+                ->getQuery()
+                ->getOneOrNullResult();
+        } catch (\InvalidArgumentException) {
+            return null;
+        }
+    }
 }

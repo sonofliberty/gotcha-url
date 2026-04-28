@@ -25,6 +25,7 @@ class Link
     #[ORM\Column(length: 10, options: ['default' => 'redirect'])]
     private string $type = 'redirect';
 
+    #[Assert\Length(max: 2048)]
     #[ORM\Column(length: 2048, nullable: true)]
     private ?string $targetUrl = null;
 
@@ -32,7 +33,7 @@ class Link
     #[Assert\Length(max: 50000)]
     private ?string $markdownContent = null;
 
-    #[Assert\Regex(pattern: '/^[a-zA-Z0-9]{3,10}$/')]
+    #[Assert\Regex(pattern: '/^[a-zA-Z0-9]{7}$/', message: 'Slug must be exactly 7 alphanumeric characters.')]
     #[ORM\Column(length: 10, unique: true)]
     private string $slug;
 
@@ -47,7 +48,7 @@ class Link
     private \DateTimeImmutable $createdAt;
 
     /** @var Collection<int, Visit> */
-    #[ORM\OneToMany(targetEntity: Visit::class, mappedBy: 'link', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Visit::class, mappedBy: 'link', orphanRemoval: true, fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['createdAt' => 'DESC'])]
     private Collection $visits;
 
@@ -127,6 +128,10 @@ class Link
                     ->addViolation();
             } elseif (!filter_var($this->targetUrl, FILTER_VALIDATE_URL)) {
                 $context->buildViolation('Please enter a valid URL.')
+                    ->atPath('targetUrl')
+                    ->addViolation();
+            } elseif (!in_array(strtolower((string) parse_url($this->targetUrl, PHP_URL_SCHEME)), ['http', 'https'], true)) {
+                $context->buildViolation('Target URL must use http or https.')
                     ->atPath('targetUrl')
                     ->addViolation();
             }

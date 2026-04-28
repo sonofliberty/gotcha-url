@@ -16,6 +16,14 @@ security:
             pattern: ^/api/track$
             security: false
 
+        api:
+            pattern: ^/api/v1
+            stateless: true
+            provider: account_code_provider
+            custom_authenticators:
+                - App\Security\ApiTokenAuthenticator
+            entry_point: App\Security\ApiTokenAuthenticator
+
         main:
             lazy: true
             provider: account_code_provider
@@ -29,4 +37,6 @@ security:
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/doc, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/dashboard, roles: IS_AUTHENTICATED_FULLY }

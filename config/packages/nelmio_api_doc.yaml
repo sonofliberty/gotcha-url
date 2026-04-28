@@ -1,0 +1,28 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Gotcha URL API
+            description: |
+                REST API for creating and managing short links.
+
+                **Authentication:** include your account code as a Bearer token in the
+                `Authorization` header. Your account code is shown on the dashboard under
+                "API Access".
+
+                **Rate limit:** 60 requests per minute per token.
+            version: 1.0.0
+        servers:
+            - url: http://localhost:8080
+              description: Local development
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    description: 'Use your account code (UUID) as the bearer token.'
+        security:
+            - Bearer: []
+    areas:
+        default:
+            path_patterns:
+                - ^/api/v1
