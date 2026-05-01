@@ -49,7 +49,7 @@ Routes `/{slug}` (pattern `^/[a-zA-Z0-9]{7}$`) and `/api/track` are **public** (
 
 ### REST API
 
-`/api/v1/links` (POST/GET), `/api/v1/links/{id}` (GET/DELETE). Bearer token = `User.accountCode`. Rate-limited 60 req/min per token (`api` limiter). JSON shape produced by `App\Service\LinkSerializer`. OpenAPI/Swagger UI at `/api/doc` via `nelmio/api-doc-bundle` (schema described by `App\ApiResource\LinkResource`).
+`/api/v1/links` (POST/GET), `/api/v1/links/{id}` (GET/DELETE), `/api/v1/links/{id}/visits` (GET, 50/page), `/api/v1/visits/{id}` (GET). Bearer token = `User.accountCode`. Rate-limited 60 req/min per token (`api` limiter). Links list paginates 20/page; visits list paginates 50/page. JSON shapes produced by `App\Service\LinkSerializer` and `App\Service\VisitSerializer`. Rate-limit + error envelope helpers live in `App\Service\Api\ApiResponder`. OpenAPI/Swagger UI at `/api/doc` via `nelmio/api-doc-bundle` (schemas described by `App\ApiResource\{LinkResource,VisitResource,...}`).
 
 ### Frontend
 
@@ -61,4 +61,4 @@ Templates use Bootstrap 5 (served locally from `public/css/` and `public/js/`) w
 - Autowiring enabled; services registered in `config/services.yaml`
 - Repositories contain paginated query methods (20 links/page, 50 visits/page)
 - `SlugGenerator` service produces 7-char alphanumeric slugs, checks uniqueness against DB
-- No test suite exists yet
+- PHPUnit suite under `tests/` mirrors `src/`; run via `docker compose exec php vendor/bin/phpunit`. Controller tests use plain `TestCase` with stubbed repositories rather than `WebTestCase`.
