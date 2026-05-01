@@ -3,6 +3,8 @@
 namespace App\Service\Api;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class ApiResponder
 {
@@ -16,6 +18,16 @@ class ApiResponder
             $body['details'] = $details;
         }
         return new JsonResponse($body, $status);
+    }
+
+    public function validationErrorResponse(ConstraintViolationListInterface $errors): JsonResponse
+    {
+        $details = [];
+        foreach ($errors as $error) {
+            $path = $error->getPropertyPath() ?: '_';
+            $details[$path] = (string) $error->getMessage();
+        }
+        return $this->errorResponse('validation_failed', 'Request validation failed.', Response::HTTP_UNPROCESSABLE_ENTITY, $details);
     }
 
     /**

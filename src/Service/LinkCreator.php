@@ -5,8 +5,6 @@ namespace App\Service;
 use App\Entity\Link;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -42,11 +40,11 @@ final class LinkCreator
         $label = ($label !== null && $label !== '') ? $label : null;
 
         if (!in_array($type, self::ALLOWED_TYPES, true)) {
-            return $this->violation('type', sprintf('Type must be one of: %s.', implode(', ', self::ALLOWED_TYPES)), $type);
+            return ViolationFactory::single('type', sprintf('Type must be one of: %s.', implode(', ', self::ALLOWED_TYPES)), $type);
         }
 
         if ($customSlug !== null && $this->isSlugReserved($customSlug)) {
-            return $this->violation('slug', sprintf('Slug "%s" is reserved.', $customSlug), $customSlug);
+            return ViolationFactory::single('slug', sprintf('Slug "%s" is reserved.', $customSlug), $customSlug);
         }
 
         $link = new Link();
@@ -71,12 +69,5 @@ final class LinkCreator
         $this->em->flush();
 
         return $link;
-    }
-
-    private function violation(string $path, string $message, ?string $invalidValue): ConstraintViolationList
-    {
-        return new ConstraintViolationList([
-            new ConstraintViolation($message, null, [], null, $path, $invalidValue),
-        ]);
     }
 }

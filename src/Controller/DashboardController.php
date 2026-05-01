@@ -6,6 +6,8 @@ use App\Entity\User;
 use App\Repository\LinkRepository;
 use App\Repository\VisitRepository;
 use App\Service\LinkCreator;
+use App\Service\LinkUpdateInput;
+use App\Service\LinkUpdater;
 use App\Service\PageResponseFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,7 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
 class DashboardController extends AbstractController
@@ -142,8 +143,7 @@ class DashboardController extends AbstractController
         string $id,
         Request $request,
         LinkRepository $linkRepository,
-        EntityManagerInterface $em,
-        ValidatorInterface $validator,
+        LinkUpdater $linkUpdater,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -155,14 +155,11 @@ class DashboardController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
         $label = trim((string) ($data['label'] ?? ''));
-        $link->setLabel($label === '' ? null : $label);
 
-        $errors = $validator->validate($link);
-        if (count($errors) > 0) {
-            return new JsonResponse(['error' => (string) $errors->get(0)->getMessage()], 422);
+        $result = $linkUpdater->update($link, LinkUpdateInput::label($label));
+        if ($result instanceof ConstraintViolationListInterface) {
+            return new JsonResponse(['error' => (string) $result->get(0)->getMessage()], 422);
         }
-
-        $em->flush();
 
         return new JsonResponse(['label' => $link->getLabel()]);
     }
@@ -172,7 +169,7 @@ class DashboardController extends AbstractController
         string $id,
         Request $request,
         LinkRepository $linkRepository,
-        EntityManagerInterface $em,
+        LinkUpdater $linkUpdater,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -184,9 +181,11 @@ class DashboardController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
         $trackingEnabled = (bool) ($data['tracking_enabled'] ?? true);
-        $link->setTrackingEnabled($trackingEnabled);
 
-        $em->flush();
+        $result = $linkUpdater->update($link, LinkUpdateInput::trackingEnabled($trackingEnabled));
+        if ($result instanceof ConstraintViolationListInterface) {
+            return new JsonResponse(['error' => (string) $result->get(0)->getMessage()], 422);
+        }
 
         return new JsonResponse(['tracking_enabled' => $link->isTrackingEnabled()]);
     }
@@ -196,8 +195,7 @@ class DashboardController extends AbstractController
         string $id,
         Request $request,
         LinkRepository $linkRepository,
-        EntityManagerInterface $em,
-        ValidatorInterface $validator,
+        LinkUpdater $linkUpdater,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -207,20 +205,13 @@ class DashboardController extends AbstractController
             return new JsonResponse(['error' => 'Link not found.'], 404);
         }
 
-        if (!$link->isPage()) {
-            return new JsonResponse(['error' => 'Only page links have editable content.'], 422);
-        }
-
         $data = json_decode($request->getContent(), true);
         $content = trim((string) ($data['markdown_content'] ?? ''));
-        $link->setMarkdownContent($content);
 
-        $errors = $validator->validate($link);
-        if (count($errors) > 0) {
-            return new JsonResponse(['error' => (string) $errors->get(0)->getMessage()], 422);
+        $result = $linkUpdater->update($link, LinkUpdateInput::markdownContent($content));
+        if ($result instanceof ConstraintViolationListInterface) {
+            return new JsonResponse(['error' => (string) $result->get(0)->getMessage()], 422);
         }
-
-        $em->flush();
 
         return new JsonResponse(['markdown_content' => $link->getMarkdownContent()]);
     }

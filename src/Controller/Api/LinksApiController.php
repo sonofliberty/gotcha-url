@@ -12,6 +12,8 @@ use App\Repository\LinkRepository;
 use App\Service\Api\ApiResponder;
 use App\Service\LinkCreator;
 use App\Service\LinkSerializer;
+use App\Service\LinkUpdateInput;
+use App\Service\LinkUpdater;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -143,12 +145,7 @@ class LinksApiController extends AbstractController
         }
 
         if ($result instanceof ConstraintViolationListInterface) {
-            $details = [];
-            foreach ($result as $error) {
-                $path = $error->getPropertyPath() ?: '_';
-                $details[$path] = (string) $error->getMessage();
-            }
-            return $this->responder->errorResponse('validation_failed', 'Request validation failed.', Response::HTTP_UNPROCESSABLE_ENTITY, $details);
+            return $this->responder->validationErrorResponse($result);
         }
 
         $location = $this->urlGenerator->generate('api_v1_link_show', ['id' => $result->getId()->toRfc4122()]);
@@ -266,6 +263,123 @@ class LinksApiController extends AbstractController
         }
 
         return new JsonResponse($this->serializer->toArray($link));
+    }
+
+    #[Route('/api/v1/links/{id}', name: 'api_v1_link_update', methods: ['PATCH'])]
+    #[OA\Patch(
+        summary: 'Update a short link',
+        description: <<<'TXT'
+            Partially updates an existing link owned by the authenticated user.
+            Send only the fields you want to change. `slug`, `type`, and creation time are immutable.
+
+            - `label`, `tracking_enabled`: editable on any link.
+            - `content`: editable only on `page` links; sending it on a `redirect` link returns 422.
+            - `target_url`: editable only on `redirect` links; sending it on a `page` link returns 422. Must use http or https.
+            - `label: null` or `label: ""` clears the label.
+            - Empty PATCH body or no recognized fields returns 400.
+            TXT,
+        requestBody: new OA\RequestBody(
+            required: true,
+            description: 'Fields to update. At least one recognized field must be present.',
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'label', type: 'string', maxLength: 100, nullable: true, example: 'Spring campaign', description: 'New label, or `null`/`""` to clear.'),
+                    new OA\Property(property: 'tracking_enabled', type: 'boolean', example: true, description: 'Toggle visit tracking. Must be a strict boolean.'),
+                    new OA\Property(property: 'content', type: 'string', maxLength: 50000, nullable: true, example: '# Hello', description: 'Page content. Only valid for `type=page` links.'),
+                    new OA\Property(property: 'target_url', type: 'string', format: 'uri', maxLength: 2048, example: 'https://example.com/new', description: 'Destination URL. Only valid for `type=redirect` links. Must use http or https.'),
+                ],
+                example: [
+                    'label' => 'Renamed',
+                    'tracking_enabled' => false,
+                ],
+            ),
+        ),
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                description: 'Link UUID (v7).',
+                schema: new OA\Schema(type: 'string', format: 'uuid'),
+                example: '01933b8a-e234-7000-8a00-000000000001',
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Link updated. Body is the full updated Link.',
+                content: new OA\JsonContent(ref: new Model(type: LinkResource::class)),
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid JSON, empty body, no recognized fields, or non-boolean `tracking_enabled`.',
+                content: new OA\JsonContent(ref: new Model(type: ErrorResponse::class)),
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Missing or invalid bearer token.',
+                content: new OA\JsonContent(ref: new Model(type: ErrorResponse::class)),
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'No link with that id exists for this user.',
+                content: new OA\JsonContent(ref: new Model(type: ErrorResponse::class)),
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation failed (field constraints or type-mismatch like `content` on a redirect link).',
+                content: new OA\JsonContent(ref: new Model(type: ValidationErrorResponse::class)),
+            ),
+            new OA\Response(
+                response: 429,
+                description: 'Rate limit exceeded (60 req/min per token).',
+                headers: [
+                    new OA\Header(header: 'Retry-After', description: 'Seconds until the rate limit window resets.', schema: new OA\Schema(type: 'integer', minimum: 0)),
+                ],
+                content: new OA\JsonContent(ref: new Model(type: RateLimitErrorResponse::class)),
+            ),
+        ],
+    )]
+    public function update(
+        string $id,
+        Request $request,
+        LinkRepository $linkRepository,
+        LinkUpdater $linkUpdater,
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $link = $linkRepository->findOneByIdAndUser($id, $user);
+        if ($link === null) {
+            return $this->responder->errorResponse('not_found', 'Link not found.', Response::HTTP_NOT_FOUND);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        if (!is_array($data)) {
+            return $this->responder->errorResponse('bad_request', 'Request body must be valid JSON.', Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $input = LinkUpdateInput::fromArray($data);
+        } catch (\InvalidArgumentException $e) {
+            return $this->responder->errorResponse('bad_request', $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($input->isEmpty()) {
+            return $this->responder->errorResponse(
+                'bad_request',
+                'PATCH body must include at least one updatable field: label, tracking_enabled, content, target_url.',
+                Response::HTTP_BAD_REQUEST,
+            );
+        }
+
+        $result = $linkUpdater->update($link, $input);
+
+        if ($result instanceof ConstraintViolationListInterface) {
+            return $this->responder->validationErrorResponse($result);
+        }
+
+        return new JsonResponse($this->serializer->toArray($result));
     }
 
     #[Route('/api/v1/links/{id}', name: 'api_v1_link_delete', methods: ['DELETE'])]
