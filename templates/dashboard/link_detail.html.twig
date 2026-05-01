@@ -37,8 +37,12 @@
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h6 class="mb-0">Page Content</h6>
-            <button type="button" class="btn btn-sm btn-outline-primary" id="edit-content-btn"
-                    data-link-id="{{ link.id }}">Edit Content</button>
+            <div class="d-flex gap-2">
+                <a href="{{ path('app_link_preview', {id: link.id}) }}" target="_blank" rel="noopener"
+                   class="btn btn-sm btn-outline-secondary">Preview (no tracking)</a>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="edit-content-btn"
+                        data-link-id="{{ link.id }}">Edit Content</button>
+            </div>
         </div>
         <div id="content-display" class="small text-muted" style="white-space: pre-wrap; max-height: 200px; overflow-y: auto;">{{ link.markdownContent }}</div>
         <div id="content-editor" class="d-none">

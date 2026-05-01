@@ -6,6 +6,7 @@ use App\Entity\Link;
 use App\Entity\User;
 use App\Repository\LinkRepository;
 use App\Repository\VisitRepository;
+use App\Service\PageResponseFactory;
 use App\Service\SlugGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -233,5 +234,26 @@ class DashboardController extends AbstractController
         $em->flush();
 
         return new JsonResponse(['markdown_content' => $link->getMarkdownContent()]);
+    }
+
+    #[Route('/dashboard/links/{id}/preview', name: 'app_link_preview', methods: ['GET'])]
+    public function previewContent(
+        string $id,
+        LinkRepository $linkRepository,
+        PageResponseFactory $pageResponseFactory,
+    ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+        $link = $linkRepository->findOneByIdAndUser($id, $user);
+
+        if (!$link) {
+            throw $this->createNotFoundException('Link not found.');
+        }
+
+        if (!$link->isPage()) {
+            throw $this->createNotFoundException('Preview is only available for page links.');
+        }
+
+        return $pageResponseFactory->build($link, null, null, 'dashboard/link_preview.html.twig');
     }
 }

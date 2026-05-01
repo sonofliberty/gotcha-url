@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\LinkRepository;
-use App\Service\MarkdownRenderer;
+use App\Service\PageResponseFactory;
 use App\Service\TrackingTokenService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class RedirectController extends AbstractController
 {
     #[Route('/{slug}', name: 'app_track', requirements: ['slug' => '[a-zA-Z0-9]{7}'], priority: -100)]
-    public function track(string $slug, Request $request, LinkRepository $linkRepository, TrackingTokenService $tokenService, MarkdownRenderer $markdownRenderer): Response
+    public function track(string $slug, Request $request, LinkRepository $linkRepository, TrackingTokenService $tokenService, PageResponseFactory $pageResponseFactory): Response
     {
         $link = $linkRepository->findBySlug($slug);
 
@@ -30,28 +30,7 @@ class RedirectController extends AbstractController
             : ['token' => null, 'ts' => null];
 
         if ($link->isPage()) {
-            $result = $markdownRenderer->render($link->getMarkdownContent() ?? '');
-
-            if ($result->isFullDocument) {
-                $html = $result->html;
-                if ($tokenData['token'] !== null) {
-                    $tracker = $this->renderView('page/_tracking_script.html.twig', [
-                        'slug' => $slug,
-                        'trackToken' => $tokenData['token'],
-                        'trackTs' => $tokenData['ts'],
-                    ]);
-                    $html = $markdownRenderer->injectBeforeBodyClose($html, $tracker);
-                }
-                return new Response($html);
-            }
-
-            return $this->render('page/content.html.twig', [
-                'slug' => $slug,
-                'title' => $result->title,
-                'contentHtml' => $result->html,
-                'trackToken' => $tokenData['token'],
-                'trackTs' => $tokenData['ts'],
-            ]);
+            return $pageResponseFactory->build($link, $tokenData['token'], $tokenData['ts']);
         }
 
         return $this->render('redirect/loading.html.twig', [
