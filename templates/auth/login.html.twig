@@ -3,36 +3,40 @@
 {% block title %}Login - Gotcha URL{% endblock %}
 
 {% block body %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="card shadow">
-            <div class="card-body p-4">
-                <h3 class="card-title text-center mb-4">Gotcha URL</h3>
-                <p class="text-muted text-center">Enter your account code to access your dashboard.</p>
+<section class="login-hero">
+    <div class="login-hero__brand">
+        <h1>Gotcha<br><em>URL.</em></h1>
+        <div class="login-hero__rule"></div>
+        <p class="login-hero__tagline">
+            <strong>A field manual for your links.</strong><br>
+            Shorten URLs, publish pages, and read every visitor's fingerprint &mdash; right down to GPU and color depth.
+        </p>
+    </div>
 
-                {% if error %}
-                    <div class="alert alert-danger">
-                        Invalid account code. Please try again.
-                    </div>
-                {% endif %}
+    <div class="login-hero__form">
+        <div class="login-hero__form-title">— Sign in</div>
 
-                <form method="post" action="{{ path('app_login') }}">
-                    <div class="mb-3">
-                        <label for="account_code" class="form-label">Account Code</label>
-                        <input type="text" class="form-control" id="account_code" name="account_code"
-                               placeholder="Your account code" required autofocus>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
-                </form>
-
-                <hr>
-
-                <div class="text-center">
-                    <p class="text-muted small mb-2">Don't have an account?</p>
-                    <a href="{{ path('app_register') }}" class="btn btn-outline-success w-100">Create New Account</a>
-                </div>
+        {% if error %}
+            <div class="alert alert-danger">
+                Invalid account code. Please try again.
             </div>
+        {% endif %}
+
+        <form method="post" action="{{ path('app_login') }}">
+            <div class="mb-3">
+                <label for="account_code" class="form-label">Account Code</label>
+                <input type="text" class="form-control" id="account_code" name="account_code"
+                       placeholder="xxxx-xxxx-xxxx" required autofocus>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mb-3">Enter dashboard &rarr;</button>
+        </form>
+
+        <hr>
+
+        <div class="text-center">
+            <p class="text-muted small mb-2">No account?</p>
+            <a href="{{ path('app_register') }}" class="btn btn-outline-success w-100">Issue a new code</a>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

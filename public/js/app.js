@@ -62,6 +62,25 @@ document.addEventListener('click', function(e) {
     });
 }, true);
 
+// Password input show/hide toggle
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-toggle-password]');
+    if (!btn) return;
+    var input = document.getElementById(btn.getAttribute('data-toggle-password'));
+    if (!input) return;
+    var hidden = input.type === 'password';
+    input.type = hidden ? 'text' : 'password';
+    btn.textContent = hidden ? 'Hide' : 'Show';
+});
+
+// Row click → navigate (skips clicks on interactive descendants)
+document.addEventListener('click', function(e) {
+    var row = e.target.closest('[data-href]');
+    if (!row) return;
+    if (e.target.closest('button, a, input, label, .label-display')) return;
+    window.location = row.getAttribute('data-href');
+});
+
 // Inline label editing
 document.addEventListener('click', function(e) {
     var el = e.target.closest('.label-display');
@@ -169,6 +188,7 @@ document.addEventListener('change', function(e) {
     var pageFields = document.getElementById('page-fields');
     var urlInput = document.getElementById('target-url-input');
     var contentInput = document.getElementById('markdown-content-input');
+    var submitVerb = document.querySelector('#create-link-submit .submit-verb');
 
     radios.forEach(function(radio) {
         radio.addEventListener('change', function() {
@@ -178,6 +198,11 @@ document.addEventListener('change', function(e) {
             pageFields.classList.toggle('d-none', !isPage);
             urlInput.required = !isPage;
             contentInput.required = isPage;
+            if (submitVerb) {
+                submitVerb.textContent = isPage
+                    ? submitVerb.dataset.verbPage
+                    : submitVerb.dataset.verbRedirect;
+            }
         });
     });
 })();

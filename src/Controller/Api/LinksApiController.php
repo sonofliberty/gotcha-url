@@ -46,7 +46,7 @@ class LinksApiController extends AbstractController
                     new OA\Property(property: 'slug', type: 'string', pattern: '^[a-zA-Z0-9]{7}$', nullable: true, example: null, description: 'Custom 7-char slug. Auto-generated if omitted.'),
                     new OA\Property(property: 'label', type: 'string', maxLength: 100, nullable: true, example: 'Spring campaign'),
                     new OA\Property(property: 'tracking_enabled', type: 'boolean', default: true),
-                    new OA\Property(property: 'markdown_content', type: 'string', nullable: true, description: 'Required for type=page. Accepts Markdown or HTML; scripts, event handlers, and unsafe URL schemes are stripped at render time.'),
+                    new OA\Property(property: 'content', type: 'string', nullable: true, description: 'Required for type=page. Accepts Markdown, HTML, or plain text; scripts, event handlers, and unsafe URL schemes are stripped at render time.'),
                 ],
             ),
         ),
@@ -94,7 +94,7 @@ class LinksApiController extends AbstractController
         }
 
         if ($type === 'page') {
-            $link->setMarkdownContent(isset($data['markdown_content']) ? (string) $data['markdown_content'] : null);
+            $link->setMarkdownContent(isset($data['content']) ? (string) $data['content'] : null);
         } else {
             $link->setTargetUrl(isset($data['target_url']) ? trim((string) $data['target_url']) : null);
         }

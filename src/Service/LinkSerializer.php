@@ -25,7 +25,7 @@ class LinkSerializer
             'target_url' => $link->getTargetUrl(),
             'label' => $link->getLabel(),
             'tracking_enabled' => $link->isTrackingEnabled(),
-            'markdown_content' => $link->getMarkdownContent(),
+            'content' => $link->getMarkdownContent(),
             'visit_count' => $link->getVisitCount(),
             'created_at' => $link->getCreatedAt()->format(\DateTimeInterface::ATOM),
         ];

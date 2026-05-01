@@ -32,8 +32,8 @@ class LinkResource
     #[OA\Property(type: 'boolean', example: true)]
     public bool $tracking_enabled;
 
-    #[OA\Property(type: 'string', nullable: true, example: null, description: 'Markdown or HTML page content. Sanitized at render time: scripts, event handlers, and unsafe URL schemes are stripped.')]
-    public ?string $markdown_content = null;
+    #[OA\Property(type: 'string', nullable: true, example: null, description: 'Page content. Accepts Markdown, HTML, or plain text. Sanitized at render time: scripts, event handlers, and unsafe URL schemes are stripped.')]
+    public ?string $content = null;
 
     #[OA\Property(type: 'integer', example: 0)]
     public int $visit_count;

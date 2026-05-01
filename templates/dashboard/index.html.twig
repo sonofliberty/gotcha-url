@@ -3,154 +3,157 @@
 {% block title %}Dashboard - Gotcha URL{% endblock %}
 
 {% block body %}
-<div class="card border-0 shadow-sm mb-4">
-    <div class="card-body py-3">
+<section class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+        <h5 class="card-title mb-1">Create new link</h5>
+        <p class="text-muted small mb-4">Shorten a URL or publish a Markdown page.</p>
+
         <form method="post" action="{{ path('app_create_link') }}" id="create-link-form">
             <input type="hidden" name="link_type" id="link-type-input" value="redirect">
-            <div class="btn-group btn-group-sm mb-2 w-100" role="group">
-                <input type="radio" class="btn-check" name="link_type_radio" id="type-redirect" value="redirect" checked>
-                <label class="btn btn-outline-primary" for="type-redirect">Redirect Link</label>
-                <input type="radio" class="btn-check" name="link_type_radio" id="type-page" value="page">
-                <label class="btn btn-outline-primary" for="type-page">Content Page</label>
-            </div>
-            <div id="redirect-fields">
-                <div class="input-group mb-2">
-                    <span class="input-group-text bg-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-muted" viewBox="0 0 16 16">
-                            <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
-                            <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
-                        </svg>
-                    </span>
-                    <input type="url" class="form-control" name="target_url" id="target-url-input"
-                           placeholder="Paste a URL to shorten..." required>
-                    <button type="submit" class="btn btn-primary">Shorten</button>
+
+            <fieldset class="mb-3">
+                <legend class="form-label small mb-2">Type</legend>
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="form-check-input" name="link_type_radio"
+                           id="type-redirect" value="redirect" checked>
+                    <label class="form-check-label" for="type-redirect">Redirect</label>
                 </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="form-check-input" name="link_type_radio"
+                           id="type-page" value="page">
+                    <label class="form-check-label" for="type-page">Page</label>
+                </div>
+            </fieldset>
+
+            <div id="redirect-fields" class="mb-3">
+                <label for="target-url-input" class="form-label">Destination URL</label>
+                <input type="url" class="form-control" name="target_url" id="target-url-input"
+                       placeholder="https://example.com/very/long/path" required>
             </div>
-            <div id="page-fields" class="d-none">
-                <textarea class="form-control mb-1" name="markdown_content" id="markdown-content-input"
-                          rows="5" placeholder="Write your page content in Markdown or HTML..."></textarea>
-                <small class="text-muted d-block mb-2">Markdown and safe HTML supported. Scripts, event handlers, and unsafe URL schemes are stripped.</small>
-                <button type="submit" class="btn btn-primary">Create Page</button>
+
+            <div id="page-fields" class="mb-3 d-none">
+                <label for="markdown-content-input" class="form-label">Page content</label>
+                <textarea class="form-control" name="markdown_content" id="markdown-content-input"
+                          rows="6" placeholder="# Hello&#10;&#10;Markdown or safe HTML..."></textarea>
+                <div class="form-text">Markdown and safe HTML supported. Scripts and unsafe URL schemes are stripped.</div>
             </div>
-            <input type="text" class="form-control form-control-sm" name="label"
-                   placeholder="Label (optional)" maxlength="100">
+
+            <div class="mb-4">
+                <label for="label-input" class="form-label">
+                    Label <span class="text-muted fw-normal">(optional)</span>
+                </label>
+                <input type="text" class="form-control" name="label" id="label-input"
+                       placeholder="my-campaign" maxlength="100">
+            </div>
+
+            <button type="submit" class="btn btn-primary px-4" id="create-link-submit">
+                <span class="submit-verb"
+                      data-verb-redirect="Shorten link"
+                      data-verb-page="Publish page">Shorten link</span>
+            </button>
         </form>
     </div>
-</div>
+</section>
 
 <details class="card border-0 shadow-sm mb-4">
-    <summary class="card-body py-2 d-flex align-items-center justify-content-between" style="cursor:pointer; list-style:none;">
-        <span class="fw-medium">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16">
-                <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
-                <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zM9 1.5v2A1.5 1.5 0 0 0 10.5 5h2V14a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
-            </svg>
-            API Access
-        </span>
-        <span class="text-muted small">click to expand</span>
+    <summary class="card-body py-3 d-flex align-items-center justify-content-between summary-row">
+        <div>
+            <h6 class="mb-0">API access</h6>
+            <span class="text-muted small">REST endpoint authenticated with Bearer token</span>
+        </div>
+        <span class="text-muted small">expand</span>
     </summary>
-    <div class="card-body pt-0">
-        <p class="small mb-2">
-            Use the REST API to create links programmatically. Authenticate with your account code as a Bearer token.
-            See the <a href="/api/doc" target="_blank">interactive API docs</a> for full reference.
+    <div class="card-body pt-0 px-4 pb-4">
+        <p class="small text-muted mb-3">
+            Create links programmatically. See the <a href="/api/doc" target="_blank">interactive API docs</a> for the full reference.
         </p>
-        <label class="form-label small mb-1">Your API token (account code)</label>
-        <div class="input-group input-group-sm mb-2">
+
+        <label for="api-token-input" class="form-label small">Your API token</label>
+        <div class="input-group input-group-sm mb-3">
             <input type="password" class="form-control font-monospace" id="api-token-input"
                    value="{{ app.user.accountCode }}" readonly>
-            <button type="button" class="btn btn-outline-secondary" id="api-token-show">Show</button>
-            <button type="button" class="btn btn-outline-secondary" id="api-token-copy">Copy</button>
+            <button type="button" class="btn btn-outline-secondary" data-toggle-password="api-token-input">Show</button>
+            <button type="button" class="btn btn-outline-secondary btn-copy"
+                    data-url="{{ app.user.accountCode }}">Copy</button>
         </div>
-        <div class="bg-light p-2 rounded small font-monospace text-break">
-            curl -X POST {{ app.request.schemeAndHttpHost }}/api/v1/links \<br>
-            &nbsp;&nbsp;-H "Authorization: Bearer &lt;your-token&gt;" \<br>
-            &nbsp;&nbsp;-H "Content-Type: application/json" \<br>
-            &nbsp;&nbsp;-d '{"target_url":"https://example.com"}'
-        </div>
+
+        <pre class="dashboard-codeblock mb-0"><code>curl -X POST {{ app.request.schemeAndHttpHost }}/api/v1/links \
+  -H "Authorization: Bearer &lt;your-token&gt;" \
+  -H "Content-Type: application/json" \
+  -d '{"target_url":"https://example.com"}'</code></pre>
     </div>
 </details>
-<script>
-document.getElementById('api-token-show')?.addEventListener('click', function() {
-    var input = document.getElementById('api-token-input');
-    if (input.type === 'password') { input.type = 'text'; this.textContent = 'Hide'; }
-    else { input.type = 'password'; this.textContent = 'Show'; }
-});
-document.getElementById('api-token-copy')?.addEventListener('click', function() {
-    var input = document.getElementById('api-token-input');
-    navigator.clipboard.writeText(input.value).then(() => {
-        var orig = this.textContent;
-        this.textContent = 'Copied!';
-        this.classList.replace('btn-outline-secondary', 'btn-success');
-        setTimeout(() => { this.textContent = orig; this.classList.replace('btn-success', 'btn-outline-secondary'); }, 1500);
-    });
-});
-</script>
+
+<h5 class="mb-3">
+    Your links
+    <span class="text-muted fw-normal small">({{ links|length }})</span>
+</h5>
 
 {% if links|length == 0 %}
-    <div class="text-center py-5 text-muted">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="mb-3 opacity-25" viewBox="0 0 16 16">
-            <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
-            <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
-        </svg>
-        <p class="mb-1 fw-medium">No links yet</p>
-        <p class="small">Paste a URL above to create your first short link.</p>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+            <p class="text-muted mb-1 fw-medium">No links yet</p>
+            <p class="text-muted small mb-0">Use the form above to create your first short link.</p>
+        </div>
     </div>
 {% else %}
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th>Destination</th>
-                    <th>Label</th>
-                    <th>Short Link</th>
-                    <th>Visits</th>
-                    <th>Tracking</th>
-                    <th>Created</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for link in links %}
-                    <tr style="cursor:pointer" onclick="window.location='{{ path('app_link_detail', {id: link.id}) }}'">
-                        <td class="text-truncate" style="max-width: 350px;">
-                            {% if link.page %}
-                                <span class="badge bg-secondary">Page</span>
-                                <span class="text-muted small">Markdown content</span>
-                            {% else %}
-                                <span title="{{ link.targetUrl }}">{{ link.targetUrl }}</span>
-                            {% endif %}
-                        </td>
-                        <td onclick="event.stopPropagation()">
-                            <span class="label-display" data-link-id="{{ link.id }}" data-label="{{ link.label ?? '' }}">
-                                {% if link.label %}
-                                    {{ link.label }}
-                                {% else %}
-                                    <span class="text-muted fst-italic">+ label</span>
-                                {% endif %}
-                            </span>
-                        </td>
-                        <td class="text-nowrap">
-                            <code class="me-1">{{ url('app_track', {slug: link.slug}) }}</code>
-                            <button type="button" class="btn btn-sm btn-outline-secondary btn-copy"
-                                    data-url="{{ url('app_track', {slug: link.slug}) }}"
-                                    onclick="event.stopPropagation()" title="Copy short URL">Copy</button>
-                        </td>
-                        <td><span class="badge bg-info">{{ link.visitCount }}</span></td>
-                        <td onclick="event.stopPropagation()" class="text-center">
-                            <div class="form-check form-switch d-inline-block mb-0">
-                                <input class="form-check-input tracking-toggle"
-                                       type="checkbox"
-                                       role="switch"
-                                       data-link-id="{{ link.id }}"
-                                       {{ link.trackingEnabled ? 'checked' : '' }}>
-                            </div>
-                        </td>
-                        <td class="text-nowrap">
-                            <time datetime="{{ link.createdAt|date('c') }}">{{ link.createdAt|date('M j, Y') }}</time>
-                        </td>
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Destination</th>
+                        <th>Label</th>
+                        <th>Short Link</th>
+                        <th>Visits</th>
+                        <th>Tracking</th>
+                        <th>Created</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for link in links %}
+                        <tr class="row-clickable" data-href="{{ path('app_link_detail', {id: link.id}) }}">
+                            <td class="text-truncate cell-destination">
+                                {% if link.page %}
+                                    <span class="badge bg-secondary">Page</span>
+                                    <span class="text-muted small">Markdown content</span>
+                                {% else %}
+                                    <span title="{{ link.targetUrl }}">{{ link.targetUrl }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="label-display" data-link-id="{{ link.id }}" data-label="{{ link.label ?? '' }}">
+                                    {% if link.label %}
+                                        {{ link.label }}
+                                    {% else %}
+                                        <span class="text-muted fst-italic">+ label</span>
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="text-nowrap">
+                                <code class="me-1">{{ url('app_track', {slug: link.slug}) }}</code>
+                                <button type="button" class="btn btn-sm btn-outline-secondary btn-copy"
+                                        data-url="{{ url('app_track', {slug: link.slug}) }}"
+                                        title="Copy short URL">Copy</button>
+                            </td>
+                            <td><span class="badge bg-info">{{ link.visitCount }}</span></td>
+                            <td class="text-center">
+                                <div class="form-check form-switch d-inline-block mb-0">
+                                    <input class="form-check-input tracking-toggle"
+                                           type="checkbox"
+                                           role="switch"
+                                           data-link-id="{{ link.id }}"
+                                           {{ link.trackingEnabled ? 'checked' : '' }}>
+                                </div>
+                            </td>
+                            <td class="text-nowrap">
+                                <time datetime="{{ link.createdAt|date('c') }}">{{ link.createdAt|date('M j, Y') }}</time>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
     {% if totalPages > 1 %}
@@ -172,4 +175,3 @@ document.getElementById('api-token-copy')?.addEventListener('click', function() 
     {% endif %}
 {% endif %}
 {% endblock %}
-

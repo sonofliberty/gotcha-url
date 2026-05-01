@@ -3,43 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
+    <title>Redirecting&hellip;</title>
     <style>
+        :root {
+            --paper: #f4efe6;
+            --ink-faded: #857c6d;
+            --ink-ghost: #c4bca8;
+            --accent: #9c2a2a;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background: #f8f9fa;
-            color: #6c757d;
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background: var(--paper);
+            color: var(--ink-faded);
+            font-family: 'Courier New', monospace;
         }
-        .loader {
-            text-align: center;
-        }
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid rgba(0,0,0,0.1);
-            border-top-color: #0d6efd;
+        .loader { text-align: center; }
+        .ring {
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 20px;
+            border: 2px solid var(--ink-ghost);
+            border-top-color: var(--accent);
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto 1.5rem;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .caption {
+            font-size: 0.78rem;
+            font-variant: small-caps;
+            letter-spacing: 0.18em;
         }
-        .loader p {
-            font-size: 14px;
-            opacity: 0.7;
+        .rule {
+            width: 32px;
+            height: 1px;
+            background: var(--ink-ghost);
+            margin: 0.85rem auto 0;
         }
     </style>
 </head>
 <body>
     <div class="loader">
-        <div class="spinner"></div>
-        <p>Redirecting...</p>
+        <div class="ring"></div>
+        <div class="caption">Redirecting</div>
+        <div class="rule"></div>
     </div>
 
     <script>
