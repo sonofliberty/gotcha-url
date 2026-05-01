@@ -27,8 +27,9 @@
                 </div>
             </div>
             <div id="page-fields" class="d-none">
-                <textarea class="form-control mb-2" name="markdown_content" id="markdown-content-input"
-                          rows="5" placeholder="Write your page content in Markdown..."></textarea>
+                <textarea class="form-control mb-1" name="markdown_content" id="markdown-content-input"
+                          rows="5" placeholder="Write your page content in Markdown or HTML..."></textarea>
+                <small class="text-muted d-block mb-2">Markdown and safe HTML supported. Scripts, event handlers, and unsafe URL schemes are stripped.</small>
                 <button type="submit" class="btn btn-primary">Create Page</button>
             </div>
             <input type="text" class="form-control form-control-sm" name="label"

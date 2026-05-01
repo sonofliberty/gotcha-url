@@ -42,7 +42,8 @@
         </div>
         <div id="content-display" class="small text-muted" style="white-space: pre-wrap; max-height: 200px; overflow-y: auto;">{{ link.markdownContent }}</div>
         <div id="content-editor" class="d-none">
-            <textarea class="form-control mb-2" id="content-textarea" rows="10">{{ link.markdownContent }}</textarea>
+            <textarea class="form-control mb-1" id="content-textarea" rows="10">{{ link.markdownContent }}</textarea>
+            <small class="text-muted d-block mb-2">Markdown and safe HTML supported. Scripts, event handlers, and unsafe URL schemes are stripped.</small>
             <div class="d-flex gap-2">
                 <button type="button" class="btn btn-sm btn-primary" id="save-content-btn">Save</button>
                 <button type="button" class="btn btn-sm btn-outline-secondary" id="cancel-content-btn">Cancel</button>

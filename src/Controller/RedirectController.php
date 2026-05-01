@@ -30,11 +30,25 @@ class RedirectController extends AbstractController
             : ['token' => null, 'ts' => null];
 
         if ($link->isPage()) {
-            $markdown = $link->getMarkdownContent() ?? '';
+            $result = $markdownRenderer->render($link->getMarkdownContent() ?? '');
+
+            if ($result->isFullDocument) {
+                $html = $result->html;
+                if ($tokenData['token'] !== null) {
+                    $tracker = $this->renderView('page/_tracking_script.html.twig', [
+                        'slug' => $slug,
+                        'trackToken' => $tokenData['token'],
+                        'trackTs' => $tokenData['ts'],
+                    ]);
+                    $html = $markdownRenderer->injectBeforeBodyClose($html, $tracker);
+                }
+                return new Response($html);
+            }
+
             return $this->render('page/content.html.twig', [
                 'slug' => $slug,
-                'title' => $markdownRenderer->extractTitle($markdown),
-                'contentHtml' => $markdownRenderer->render($markdown),
+                'title' => $result->title,
+                'contentHtml' => $result->html,
                 'trackToken' => $tokenData['token'],
                 'trackTs' => $tokenData['ts'],
             ]);
