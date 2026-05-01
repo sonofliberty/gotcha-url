@@ -2,12 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\Link;
 use App\Entity\User;
 use App\Repository\LinkRepository;
 use App\Repository\VisitRepository;
+use App\Service\LinkCreator;
 use App\Service\PageResponseFactory;
-use App\Service\SlugGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
@@ -39,45 +39,30 @@ class DashboardController extends AbstractController
     #[Route('/dashboard/links', name: 'app_create_link', methods: ['POST'])]
     public function createLink(
         Request $request,
-        EntityManagerInterface $em,
-        SlugGenerator $slugGenerator,
-        ValidatorInterface $validator,
+        LinkCreator $linkCreator,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $linkType = trim((string) $request->request->get('link_type', 'redirect'));
+        $type = trim((string) $request->request->get('link_type', 'redirect'));
         $targetUrl = trim((string) $request->request->get('target_url', ''));
         $markdownContent = trim((string) $request->request->get('markdown_content', ''));
         $label = trim((string) $request->request->get('label', ''));
 
-        $link = new Link();
-        $link->setUser($user);
-        $link->setType($linkType === 'page' ? 'page' : 'redirect');
-        $link->setSlug($slugGenerator->generate());
+        $result = $linkCreator->create(
+            user: $user,
+            type: $type,
+            targetUrl: $targetUrl !== '' ? $targetUrl : null,
+            markdownContent: $markdownContent !== '' ? $markdownContent : null,
+            label: $label !== '' ? $label : null,
+            customSlug: null,
+        );
 
-        if ($link->isPage()) {
-            $link->setMarkdownContent($markdownContent);
-        } else {
-            $link->setTargetUrl($targetUrl);
-        }
-
-        if ($label !== '') {
-            $link->setLabel($label);
-        }
-
-        $errors = $validator->validate($link);
-        if (count($errors) > 0) {
-            $errorMsg = $link->isPage()
-                ? 'Content is required for page links.'
-                : 'Invalid URL. Please enter a valid URL including http:// or https://';
-            $this->addFlash('error', $errorMsg);
+        if ($result instanceof ConstraintViolationListInterface) {
+            $this->addFlash('error', (string) $result->get(0)->getMessage());
             return $this->redirectToRoute('app_dashboard');
         }
 
-        $em->persist($link);
-        $em->flush();
-
-        $this->addFlash('success', $link->isPage() ? 'Content page created!' : 'Link created successfully!');
+        $this->addFlash('success', $result->isPage() ? 'Content page created!' : 'Link created successfully!');
         return $this->redirectToRoute('app_dashboard');
     }
 
@@ -90,9 +75,9 @@ class DashboardController extends AbstractController
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $link = $linkRepository->find($id);
+        $link = $linkRepository->findOneByIdAndUser($id, $user);
 
-        if (!$link || !$link->getUser()->getId()->equals($user->getId())) {
+        if (!$link) {
             throw $this->createNotFoundException('Link not found.');
         }
 
@@ -115,9 +100,9 @@ class DashboardController extends AbstractController
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $visit = $visitRepository->find($id);
+        $visit = $visitRepository->findOneByIdAndUser($id, $user);
 
-        if (!$visit || !$visit->getLink()->getUser()->getId()->equals($user->getId())) {
+        if (!$visit) {
             throw $this->createNotFoundException('Visit not found.');
         }
 
@@ -135,10 +120,14 @@ class DashboardController extends AbstractController
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $link = $linkRepository->find($id);
+        $link = $linkRepository->findOneByIdAndUser($id, $user);
 
-        if (!$link || !$link->getUser()->getId()->equals($user->getId())) {
+        if (!$link) {
             throw $this->createNotFoundException('Link not found.');
+        }
+
+        if (!$this->isCsrfTokenValid('delete-link-' . $id, (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
         $em->remove($link);
@@ -158,9 +147,9 @@ class DashboardController extends AbstractController
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $link = $linkRepository->find($id);
+        $link = $linkRepository->findOneByIdAndUser($id, $user);
 
-        if (!$link || !$link->getUser()->getId()->equals($user->getId())) {
+        if (!$link) {
             return new JsonResponse(['error' => 'Link not found.'], 404);
         }
 
@@ -187,9 +176,9 @@ class DashboardController extends AbstractController
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $link = $linkRepository->find($id);
+        $link = $linkRepository->findOneByIdAndUser($id, $user);
 
-        if (!$link || !$link->getUser()->getId()->equals($user->getId())) {
+        if (!$link) {
             return new JsonResponse(['error' => 'Link not found.'], 404);
         }
 
@@ -212,9 +201,9 @@ class DashboardController extends AbstractController
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
-        $link = $linkRepository->find($id);
+        $link = $linkRepository->findOneByIdAndUser($id, $user);
 
-        if (!$link || !$link->getUser()->getId()->equals($user->getId())) {
+        if (!$link) {
             return new JsonResponse(['error' => 'Link not found.'], 404);
         }
 

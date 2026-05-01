@@ -9,7 +9,7 @@ security:
             security: false
 
         redirect:
-            pattern: ^/[a-zA-Z0-9]{7}$
+            pattern: ^/%app.slug_pattern%$
             security: false
 
         api_track:

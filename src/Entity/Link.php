@@ -33,7 +33,7 @@ class Link
     #[Assert\Length(max: 50000)]
     private ?string $markdownContent = null;
 
-    #[Assert\Regex(pattern: '/^[a-zA-Z0-9]{7}$/', message: 'Slug must be exactly 7 alphanumeric characters.')]
+    #[Assert\Regex(pattern: '/^[a-zA-Z0-9]{4,10}$/', message: 'Slug must be 4–10 alphanumeric characters.')]
     #[ORM\Column(length: 10, unique: true)]
     private string $slug;
 

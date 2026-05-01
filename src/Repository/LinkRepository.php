@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Link;
 use App\Entity\User;
+use App\Repository\Concerns\HandlesMalformedUuid;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -13,6 +14,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class LinkRepository extends ServiceEntityRepository
 {
+    use HandlesMalformedUuid;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Link::class);
@@ -46,16 +49,12 @@ class LinkRepository extends ServiceEntityRepository
 
     public function findOneByIdAndUser(string $id, User $user): ?Link
     {
-        try {
-            return $this->createQueryBuilder('l')
-                ->andWhere('l.id = :id')
-                ->andWhere('l.user = :user')
-                ->setParameter('id', $id, 'uuid')
-                ->setParameter('user', $user->getId(), 'uuid')
-                ->getQuery()
-                ->getOneOrNullResult();
-        } catch (\InvalidArgumentException) {
-            return null;
-        }
+        return $this->nullOnInvalidUuid(fn () => $this->createQueryBuilder('l')
+            ->andWhere('l.id = :id')
+            ->andWhere('l.user = :user')
+            ->setParameter('id', $id, 'uuid')
+            ->setParameter('user', $user->getId(), 'uuid')
+            ->getQuery()
+            ->getOneOrNullResult());
     }
 }

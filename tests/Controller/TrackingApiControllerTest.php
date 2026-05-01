@@ -104,6 +104,7 @@ class TrackingApiControllerTest extends TestCase
 
         $link = $this->createStub(Link::class);
         $link->method('getTargetUrl')->willReturn('https://example.com');
+        $link->method('isTrackingEnabled')->willReturn(true);
         $this->linkRepo->method('findBySlug')->willReturn($link);
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -137,6 +138,7 @@ class TrackingApiControllerTest extends TestCase
 
         $link = $this->createStub(Link::class);
         $link->method('getTargetUrl')->willReturn('https://example.com');
+        $link->method('isTrackingEnabled')->willReturn(true);
         $this->linkRepo->method('findBySlug')->willReturn($link);
 
         $capturedVisit = null;
@@ -186,6 +188,7 @@ class TrackingApiControllerTest extends TestCase
 
         $link = $this->createStub(Link::class);
         $link->method('getTargetUrl')->willReturn('https://example.com');
+        $link->method('isTrackingEnabled')->willReturn(true);
         $this->linkRepo->method('findBySlug')->willReturn($link);
 
         $capturedVisit = null;
@@ -223,6 +226,7 @@ class TrackingApiControllerTest extends TestCase
 
         $link = $this->createStub(Link::class);
         $link->method('getTargetUrl')->willReturn('https://example.com');
+        $link->method('isTrackingEnabled')->willReturn(true);
         $this->linkRepo->method('findBySlug')->willReturn($link);
 
         $capturedVisit = null;

@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class RedirectController extends AbstractController
 {
-    #[Route('/{slug}', name: 'app_track', requirements: ['slug' => '[a-zA-Z0-9]{7}'], priority: -100)]
+    #[Route('/{slug}', name: 'app_track', requirements: ['slug' => '%app.slug_pattern%'], priority: -100)]
     public function track(string $slug, Request $request, LinkRepository $linkRepository, TrackingTokenService $tokenService, PageResponseFactory $pageResponseFactory): Response
     {
         $link = $linkRepository->findBySlug($slug);

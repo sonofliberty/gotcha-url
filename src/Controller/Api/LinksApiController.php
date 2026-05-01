@@ -3,11 +3,11 @@
 namespace App\Controller\Api;
 
 use App\ApiResource\LinkResource;
-use App\Entity\Link;
 use App\Entity\User;
 use App\Repository\LinkRepository;
+use App\Service\LinkCreator;
 use App\Service\LinkSerializer;
-use App\Service\SlugGenerator;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
@@ -18,13 +18,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 #[OA\Tag(name: 'Links')]
 class LinksApiController extends AbstractController
 {
     private const PER_PAGE = 20;
-    private const ALLOWED_TYPES = ['redirect', 'page'];
 
     public function __construct(
         private readonly LinkSerializer $serializer,
@@ -43,7 +42,7 @@ class LinksApiController extends AbstractController
                 properties: [
                     new OA\Property(property: 'target_url', type: 'string', format: 'uri', example: 'https://example.com/long/path', description: 'Required for type=redirect (default).'),
                     new OA\Property(property: 'type', type: 'string', enum: ['redirect', 'page'], example: 'redirect'),
-                    new OA\Property(property: 'slug', type: 'string', pattern: '^[a-zA-Z0-9]{7}$', nullable: true, example: null, description: 'Custom 7-char slug. Auto-generated if omitted.'),
+                    new OA\Property(property: 'slug', type: 'string', pattern: '^[a-zA-Z0-9]{4,10}$', nullable: true, example: null, description: 'Custom 4–10 char alphanumeric slug. Auto-generated (7 chars) if omitted.'),
                     new OA\Property(property: 'label', type: 'string', maxLength: 100, nullable: true, example: 'Spring campaign'),
                     new OA\Property(property: 'tracking_enabled', type: 'boolean', default: true),
                     new OA\Property(property: 'content', type: 'string', nullable: true, description: 'Required for type=page. Accepts Markdown, HTML, or plain text; scripts, event handlers, and unsafe URL schemes are stripped at render time.'),
@@ -60,10 +59,7 @@ class LinksApiController extends AbstractController
     )]
     public function create(
         Request $request,
-        EntityManagerInterface $em,
-        SlugGenerator $slugGenerator,
-        ValidatorInterface $validator,
-        LinkRepository $linkRepository,
+        LinkCreator $linkCreator,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -77,54 +73,38 @@ class LinksApiController extends AbstractController
             return $this->errorResponse('bad_request', 'Request body must be valid JSON.', Response::HTTP_BAD_REQUEST);
         }
 
-        $type = in_array($data['type'] ?? null, self::ALLOWED_TYPES, true) ? $data['type'] : 'redirect';
-
-        $link = new Link();
-        $link->setUser($user);
-        $link->setType($type);
-
         $customSlug = trim((string) ($data['slug'] ?? ''));
-        if ($customSlug !== '') {
-            if ($linkRepository->slugExists($customSlug)) {
-                return $this->errorResponse('slug_conflict', 'Slug already in use.', Response::HTTP_CONFLICT);
-            }
-            $link->setSlug($customSlug);
-        } else {
-            $link->setSlug($slugGenerator->generate());
+        $label = isset($data['label']) ? trim((string) $data['label']) : null;
+        $targetUrl = isset($data['target_url']) ? trim((string) $data['target_url']) : null;
+        $content = isset($data['content']) ? (string) $data['content'] : null;
+
+        try {
+            $result = $linkCreator->create(
+                user: $user,
+                type: (string) ($data['type'] ?? 'redirect'),
+                targetUrl: $targetUrl,
+                markdownContent: $content,
+                label: $label,
+                customSlug: $customSlug !== '' ? $customSlug : null,
+                trackingEnabled: isset($data['tracking_enabled']) ? (bool) $data['tracking_enabled'] : true,
+            );
+        } catch (UniqueConstraintViolationException) {
+            return $this->errorResponse('slug_conflict', 'Slug already in use.', Response::HTTP_CONFLICT);
         }
 
-        if ($type === 'page') {
-            $link->setMarkdownContent(isset($data['content']) ? (string) $data['content'] : null);
-        } else {
-            $link->setTargetUrl(isset($data['target_url']) ? trim((string) $data['target_url']) : null);
-        }
-
-        if (isset($data['label'])) {
-            $label = trim((string) $data['label']);
-            $link->setLabel($label === '' ? null : $label);
-        }
-
-        if (isset($data['tracking_enabled'])) {
-            $link->setTrackingEnabled((bool) $data['tracking_enabled']);
-        }
-
-        $errors = $validator->validate($link);
-        if (count($errors) > 0) {
+        if ($result instanceof ConstraintViolationListInterface) {
             $details = [];
-            foreach ($errors as $error) {
+            foreach ($result as $error) {
                 $path = $error->getPropertyPath() ?: '_';
                 $details[$path] = (string) $error->getMessage();
             }
             return $this->errorResponse('validation_failed', 'Request validation failed.', Response::HTTP_UNPROCESSABLE_ENTITY, $details);
         }
 
-        $em->persist($link);
-        $em->flush();
-
-        $location = $this->urlGenerator->generate('api_v1_link_show', ['id' => $link->getId()->toRfc4122()]);
+        $location = $this->urlGenerator->generate('api_v1_link_show', ['id' => $result->getId()->toRfc4122()]);
 
         return new JsonResponse(
-            $this->serializer->toArray($link),
+            $this->serializer->toArray($result),
             Response::HTTP_CREATED,
             ['Location' => $location],
         );
